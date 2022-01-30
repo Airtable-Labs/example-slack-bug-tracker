@@ -31,7 +31,7 @@ const airtableBase = airtableClient.base(process.env.AIRTABLE_BASE_ID)
 const airtableTable = airtableBase(process.env.AIRTABLE_TABLE_NAME_OR_ID)
 
 // Listen for 'File a bug' global shortcut
-app.shortcut('globalShortcut_featureRequest', async ({ shortcut, ack, client, logger }) => {
+app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client, logger }) => {
   // Acknowledge shortcut request
   await ack()
 
@@ -40,6 +40,20 @@ app.shortcut('globalShortcut_featureRequest', async ({ shortcut, ack, client, lo
   await client.views.open({
     trigger_id: shortcut.trigger_id,
     view: fileABugModalPayload()
+  })
+})
+
+// Listen for 'File a bug' message shortcut
+app.shortcut('fileABugMessageShortcut', async ({ shortcut, ack, client, logger }) => {
+  // Acknowledge shortcut request
+  await ack()
+
+  logger.debug({ shortcut })
+  // Open modal using WebClient passed in from middleware.
+  //   Uses modal defintion from views/modals.js
+  await client.views.open({
+    trigger_id: shortcut.trigger_id,
+    view: fileABugModalPayload(shortcut.message.text)
   })
 })
 

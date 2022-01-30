@@ -11,7 +11,11 @@ features:
   shortcuts:
     - name: File a bug (dev local)
       type: global
-      callback_id: globalShortcut_featureRequest
+      callback_id: fileABugGlobalShortcut
+      description: Submit bug to our Airtable base for triage
+    - name: File a bug (dev local)
+      type: message
+      callback_id: fileABugMessageShortcut
       description: Submit bug to our Airtable base for triage
 oauth_config:
   scopes:
