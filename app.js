@@ -17,7 +17,7 @@ const app = new App({
 });
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', async ({ message, say }) => {
+app.message(/.+/, async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say({
     blocks: [
@@ -27,25 +27,25 @@ app.message('hello', async ({ message, say }) => {
           "type": "mrkdwn",
           "text": `Hey there <@${message.user}>!`
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Click Me"
-          },
-          "action_id": "button_click"
-        }
+        // "accessory": {
+        //   "type": "button",
+        //   "text": {
+        //     "type": "plain_text",
+        //     "text": "Click Me"
+        //   },
+        //   "action_id": "button_click"
+        // }
       }
     ],
     text: `Hey there <@${message.user}>!`
   });
 });
 
-app.action('button_click', async ({ body, ack, say }) => {
-  // Acknowledge the action
-  await ack();
-  await say(`<@${body.user.id}> clicked the button`);
-});
+// app.action('button_click', async ({ body, ack, say }) => {
+//   // Acknowledge the action
+//   await ack();
+//   await say(`<@${body.user.id}> clicked the button`);
+// });
 
 (async () => {
   // Start your app
