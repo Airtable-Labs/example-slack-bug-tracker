@@ -31,7 +31,7 @@ const airtableBase = airtableClient.base(process.env.AIRTABLE_BASE_ID)
 const airtableTable = airtableBase(process.env.AIRTABLE_TABLE_NAME_OR_ID)
 
 // Listen for 'File a bug' global shortcut
-app.shortcut('globalShortcut_featureRequest', async ({ shortcut, ack, client, logger }) => {
+app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client, logger }) => {
   // Acknowledge shortcut request
   await ack()
 
