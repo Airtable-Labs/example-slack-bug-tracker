@@ -11,9 +11,10 @@ see: https://slack.dev/bolt-js/tutorial/getting-started
 
 // Initializes your app with your bot token and app token
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
   socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN
+  token: process.env.SLACK_BOT_TOKEN,
+  appToken: process.env.SLACK_APP_TOKEN,
+  logLevel: process.env.LOG_LEVEL || 'debug'
 })
 
 // Listen for 'File a bug' global shortcut
