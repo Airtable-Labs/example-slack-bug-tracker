@@ -28,6 +28,18 @@ const fileABugModalPayload = function () {
         type: 'divider'
       },
       {
+        block_id: 'block_title',
+        type: 'input',
+        label: {
+          type: 'plain_text',
+          text: 'Title'
+        },
+        element: {
+          action_id: 'input_title',
+          type: 'plain_text_input'
+        }
+      },
+      {
         block_id: 'block_priority',
         type: 'input',
         label: {
@@ -68,18 +80,6 @@ const fileABugModalPayload = function () {
               value: 'Low'
             }
           ]
-        }
-      },
-      {
-        block_id: 'block_title',
-        type: 'input',
-        label: {
-          type: 'plain_text',
-          text: 'Title'
-        },
-        element: {
-          action_id: 'input_title',
-          type: 'plain_text_input'
         }
       },
       {
