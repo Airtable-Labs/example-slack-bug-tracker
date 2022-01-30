@@ -24,11 +24,10 @@ app.shortcut('globalShortcut_featureRequest', async ({ shortcut, ack, client, lo
 
   // Open modal using WebClient passed in from middleware.
   //   Uses modal defintion from views/modals.js
-  const openModalResult = await client.views.open({
+  await client.views.open({
     trigger_id: shortcut.trigger_id,
     view: fileABugModalPayload()
   })
-  logger.debug({ openModalResult })
 })
 })
 
