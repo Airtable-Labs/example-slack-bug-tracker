@@ -1,6 +1,9 @@
 MIT License
 
-Copyright (c) 2020 Slack Technologies, Inc.
+Copyright (c) 2022 Mark Silverberg 
+Copyright (c) 2020 Slack Technologies, Inc. # original creator of https://github.com/slackapi/bolt-js-getting-started-app which was the base template for this repository
+
+
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

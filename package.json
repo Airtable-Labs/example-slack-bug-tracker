@@ -1,7 +1,7 @@
 {
-  "name": "bolt-js-getting-started-app",
-  "version": "2.0.0",
-  "description": "Getting Started ⚡️ Bolt for JavaScript",
+  "name": "slack-form-to-airtable",
+  "version": "0.0.1",
+  "description": "A Slack app with a form that saves responses to an Airtable base",
   "main": "app.js",
   "scripts": {
     "ngrok": "ngrok http 3000",
@@ -12,5 +12,15 @@
   "dependencies": {
     "@slack/bolt": "^3.9.0",
     "dotenv": "^14.3.2"
-  }
+  },
+  "author": {
+    "name": "Mark Silverberg",
+    "email": "mark@marksilver.net"
+  },
+  "contributors": [
+    {
+      "name": "Slack",
+      "url": "https://github.com/slackapi/bolt-js-getting-started-app"
+    }
+  ]
 }
