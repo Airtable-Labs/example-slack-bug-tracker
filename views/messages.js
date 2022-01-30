@@ -23,6 +23,6 @@ const messageToSubmitter = function (title, priority) {
   ]
 }
 
-exports.modules = {
+module.exports = {
   messageToSubmitter
 }

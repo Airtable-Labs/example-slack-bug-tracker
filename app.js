@@ -73,7 +73,7 @@ app.view('fileABugModal', async ({ ack, body, view, client, logger, respond }) =
     const dmToSubmitter = await client.chat.postMessage({
       channel: body.user.id,
       text: 'Thanks for your bug report! We will triage it ASAP.',
-      blocks: messageToSubmitter({ title, priority })
+      blocks: messageToSubmitter(title, priority)
     })
     // Add work-in-progress reaction
     await client.reactions.add({
