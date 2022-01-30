@@ -1,6 +1,7 @@
 const fileABugModalPayload = function () {
   return {
     type: 'modal',
+    callback_id: 'fileABugModal',
     submit: {
       type: 'plain_text',
       text: 'Submit :rocket:',
@@ -16,6 +17,7 @@ const fileABugModalPayload = function () {
     },
     blocks: [
       {
+        block_id: 'form_description',
         type: 'section',
         text: {
           type: 'plain_text',
@@ -26,6 +28,7 @@ const fileABugModalPayload = function () {
         type: 'divider'
       },
       {
+        block_id: 'block_priority',
         type: 'input',
         label: {
           type: 'plain_text',
@@ -33,6 +36,7 @@ const fileABugModalPayload = function () {
         },
         element: {
           type: 'static_select',
+          action_id: 'input_priority',
           placeholder: {
             type: 'plain_text',
             text: 'Select an item',
@@ -67,28 +71,28 @@ const fileABugModalPayload = function () {
         }
       },
       {
+        block_id: 'block_title',
         type: 'input',
-        element: {
-          type: 'plain_text_input',
-          action_id: 'plain_text_input-action'
-        },
         label: {
           type: 'plain_text',
-          text: 'Title',
-          emoji: true
+          text: 'Title'
+        },
+        element: {
+          action_id: 'input_title',
+          type: 'plain_text_input'
         }
       },
       {
+        block_id: 'block_description',
         type: 'input',
-        element: {
-          type: 'plain_text_input',
-          multiline: true,
-          action_id: 'plain_text_input-action'
-        },
         label: {
           type: 'plain_text',
-          text: 'Long description',
-          emoji: true
+          text: 'Long description'
+        },
+        element: {
+          action_id: 'input_description',
+          type: 'plain_text_input',
+          multiline: true
         }
       }
     ]
