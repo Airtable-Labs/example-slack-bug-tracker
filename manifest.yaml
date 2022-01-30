@@ -1,8 +1,8 @@
 display_information:
-  name: Getting Started Bolt App
+  name: Slack Form to Airtable (dev local)
 features:
   bot_user:
-    display_name: BoltApp
+    display_name: SlackFormToAirtable
     always_online: true
 oauth_config:
   scopes:
