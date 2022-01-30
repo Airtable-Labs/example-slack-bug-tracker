@@ -58,6 +58,14 @@ npm run start
 
 Go to the installed workspace and type **Hello** in a DM to your new bot. You can also type **Hello** in a channel where the bot is present
 
+### 5. Iterate and develop
+To run restart the application whenever a file is changed, run:
+
+```zsh
+npm run watch
+```
+
+
 ## Contributing
 
 New issues and PRs are encouraged!

@@ -4,13 +4,14 @@
   "description": "A Slack app with a form that saves responses to an Airtable base",
   "main": "app.js",
   "scripts": {
-    "ngrok": "ngrok http 3000",
     "start": "node app.js",
+    "watch": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "MIT",
   "dependencies": {
     "@slack/bolt": "^3.9.0",
+    "airtable": "^0.11.1",
     "dotenv": "^14.3.2"
   },
   "author": {
@@ -22,5 +23,9 @@
       "name": "Slack",
       "url": "https://github.com/slackapi/bolt-js-getting-started-app"
     }
-  ]
+  ],
+  "devDependencies": {
+    "nodemon": "^2.0.15",
+    "standard": "^16.0.4"
+  }
 }
