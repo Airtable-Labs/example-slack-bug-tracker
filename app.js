@@ -1,3 +1,6 @@
+// Load environment variables from your .env file (if it exists)
+require('dotenv').config();
+
 const { App } = require('@slack/bolt');
 
 /* 

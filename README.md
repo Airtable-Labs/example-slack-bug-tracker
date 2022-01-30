@@ -34,11 +34,7 @@ Then scroll down in Basic Info and click **Generate Token and Scopes** with both
 
 ### 1. Setup environment variables
 
-```zsh
-# Replace with your bot and app token
-export SLACK_BOT_TOKEN=<your-bot-token> # from the OAuth section
-export SLACK_APP_TOKEN=<your-app-level-token> # from the Basic Info App Token Section
-```
+Copy `.env.example` to `.env` and paste your unique values (there are comments in the file with where to find each value)
 
 ### 2. Setup your local project
 
