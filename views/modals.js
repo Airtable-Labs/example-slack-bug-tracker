@@ -1,4 +1,4 @@
-const fileABugModalPayload = function () {
+const fileABugModalPayload = function (description = '') {
   return {
     type: 'modal',
     callback_id: 'fileABugModal',
@@ -92,7 +92,8 @@ const fileABugModalPayload = function () {
         element: {
           action_id: 'input_description',
           type: 'plain_text_input',
-          multiline: true
+          multiline: true,
+          initial_value: description
         }
       }
     ]

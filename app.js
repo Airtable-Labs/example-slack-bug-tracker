@@ -43,6 +43,20 @@ app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client, logger })
   })
 })
 
+// Listen for 'File a bug' message shortcut
+app.shortcut('fileABugMessageShortcut', async ({ shortcut, ack, client, logger }) => {
+  // Acknowledge shortcut request
+  await ack()
+
+  logger.debug({ shortcut })
+  // Open modal using WebClient passed in from middleware.
+  //   Uses modal defintion from views/modals.js
+  await client.views.open({
+    trigger_id: shortcut.trigger_id,
+    view: fileABugModalPayload(shortcut.message.text)
+  })
+})
+
 // Listen for form/modal submission
 app.view('fileABugModal', async ({ ack, body, view, client, logger, respond }) => {
   // Extract user-submitted values from view submission object
