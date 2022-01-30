@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "watch": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "MIT",
@@ -21,5 +22,8 @@
       "name": "Slack",
       "url": "https://github.com/slackapi/bolt-js-getting-started-app"
     }
-  ]
+  ],
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
 }
