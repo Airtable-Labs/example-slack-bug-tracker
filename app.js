@@ -31,7 +31,7 @@ const airtableBase = airtableClient.base(process.env.AIRTABLE_BASE_ID)
 const airtableTable = airtableBase(process.env.AIRTABLE_TABLE_ID)
 
 // Listen for 'File a bug' global shortcut
-app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client, logger }) => {
+app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client }) => {
   // Acknowledge shortcut request
   await ack()
 
@@ -44,11 +44,9 @@ app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client, logger })
 })
 
 // Listen for 'File a bug' message shortcut
-app.shortcut('fileABugMessageShortcut', async ({ shortcut, ack, client, logger }) => {
-  // Acknowledge shortcut request
+app.shortcut('fileABugMessageShortcut', async ({ ack, shortcut, client }) => {
   await ack()
 
-  logger.debug({ shortcut })
   // Open modal using WebClient passed in from middleware.
   //   Uses modal defintion from views/modals.js
   await client.views.open({
@@ -58,7 +56,7 @@ app.shortcut('fileABugMessageShortcut', async ({ shortcut, ack, client, logger }
 })
 
 // Listen for form/modal submission
-app.view('fileABugModal', async ({ ack, body, view, client, logger, respond }) => {
+app.view('fileABugModal', async ({ ack, body, view, client, logger }) => {
   // Extract user-submitted values from view submission object
   const {
     block_title: { input_title: { value: title } },
