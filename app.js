@@ -28,7 +28,7 @@ const app = new App({
 // Initialize Airtable client
 const airtableClient = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY })
 const airtableBase = airtableClient.base(process.env.AIRTABLE_BASE_ID)
-const airtableTable = airtableBase(process.env.AIRTABLE_TABLE_NAME_OR_ID)
+const airtableTable = airtableBase(process.env.AIRTABLE_TABLE_ID)
 
 // Listen for 'File a bug' global shortcut
 app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client, logger }) => {
