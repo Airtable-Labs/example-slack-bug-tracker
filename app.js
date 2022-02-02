@@ -10,6 +10,7 @@ const Airtable = require('airtable')
 // Load helper functions
 const { fileABugModalPayload } = require('./views/modals')
 const { messageToSubmitter } = require('./views/messages')
+const { blocksForAppHome } = require('./views/app_home')
 
 /*
 This sample slack application uses SocketMode
@@ -143,20 +144,27 @@ app.view('fileABugModal', async ({ ack, body, view, client, logger }) => {
   }
 })
 
-// Listens to any incoming messages
-app.message(/.+/, async ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
-  await say({
-    blocks: [
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: `Hey there <@${message.user}>!`
-        }
-      }
-    ],
-    text: `Hey there <@${message.user}>!`
+// Listen for users opening App Home
+app.event('app_home_opened', async ({ event, client }) => {
+  // Publish App Home view
+  await client.views.publish({
+    user_id: event.user,
+    view: {
+      type: 'home',
+      blocks: blocksForAppHome(process.env.AIRTABLE_BASE_ID, process.env.AIRTABLE_TABLE_ID)
+    }
+  })
+})
+
+// Listen for users clicking the 'File a bug' button from App Home
+app.action('file_a_bug', async ({ ack, body, client }) => {
+  await ack()
+
+  // Open modal using WebClient passed in from middleware.
+  //   Uses modal defintion from views/modals.js
+  await client.views.open({
+    trigger_id: body.trigger_id,
+    view: fileABugModalPayload()
   })
 });
 
