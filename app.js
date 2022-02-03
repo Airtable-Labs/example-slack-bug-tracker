@@ -10,6 +10,7 @@ const Airtable = require('airtable')
 // Load helper functions
 const { fileABugModalPayload } = require('./views/modals')
 const { messageToSubmitter } = require('./views/messages')
+const { blocksForAppHome } = require('./views/app_home')
 
 /*
 This sample slack application uses SocketMode
@@ -28,10 +29,10 @@ const app = new App({
 // Initialize Airtable client
 const airtableClient = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY })
 const airtableBase = airtableClient.base(process.env.AIRTABLE_BASE_ID)
-const airtableTable = airtableBase(process.env.AIRTABLE_TABLE_NAME_OR_ID)
+const airtableTable = airtableBase(process.env.AIRTABLE_TABLE_ID)
 
 // Listen for 'File a bug' global shortcut
-app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client, logger }) => {
+app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client }) => {
   // Acknowledge shortcut request
   await ack()
 
@@ -44,11 +45,9 @@ app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client, logger })
 })
 
 // Listen for 'File a bug' message shortcut
-app.shortcut('fileABugMessageShortcut', async ({ shortcut, ack, client, logger }) => {
-  // Acknowledge shortcut request
+app.shortcut('fileABugMessageShortcut', async ({ ack, shortcut, client }) => {
   await ack()
 
-  logger.debug({ shortcut })
   // Open modal using WebClient passed in from middleware.
   //   Uses modal defintion from views/modals.js
   await client.views.open({
@@ -58,7 +57,7 @@ app.shortcut('fileABugMessageShortcut', async ({ shortcut, ack, client, logger }
 })
 
 // Listen for form/modal submission
-app.view('fileABugModal', async ({ ack, body, view, client, logger, respond }) => {
+app.view('fileABugModal', async ({ ack, body, view, client, logger }) => {
   // Extract user-submitted values from view submission object
   const {
     block_title: { input_title: { value: title } },
@@ -116,8 +115,8 @@ app.view('fileABugModal', async ({ ack, body, view, client, logger, respond }) =
     let reactionToAdd = ''
     try {
       const newRecord = await airtableTable.create([{ fields: newRecordFields }])
-      const newRecordUrl = newRecord[0].get('AT Record URL')
-      updateToSubmitter = `:white_check_mark: Your bug report has been submitted. You can view it <${newRecordUrl}|here>`
+      const newRecordId = newRecord[0].getId()
+      updateToSubmitter = `:white_check_mark: Your bug report has been submitted. You can view it at <https://airtable.com/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_TABLE_ID}/${newRecordId}|here>`
       reactionToAdd = 'white_check_mark'
     } catch (error) {
       updateToSubmitter = `:x: <@${body.user.id}> Sorry, but an error occured while sending your report to Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)}\`\`\``
@@ -145,20 +144,27 @@ app.view('fileABugModal', async ({ ack, body, view, client, logger, respond }) =
   }
 })
 
-// Listens to any incoming messages
-app.message(/.+/, async ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
-  await say({
-    blocks: [
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: `Hey there <@${message.user}>!`
-        }
-      }
-    ],
-    text: `Hey there <@${message.user}>!`
+// Listen for users opening App Home
+app.event('app_home_opened', async ({ event, client }) => {
+  // Publish App Home view
+  await client.views.publish({
+    user_id: event.user,
+    view: {
+      type: 'home',
+      blocks: blocksForAppHome(process.env.AIRTABLE_BASE_ID, process.env.AIRTABLE_TABLE_ID)
+    }
+  })
+})
+
+// Listen for users clicking the 'File a bug' button from App Home
+app.action('file_a_bug', async ({ ack, body, client }) => {
+  await ack()
+
+  // Open modal using WebClient passed in from middleware.
+  //   Uses modal defintion from views/modals.js
+  await client.views.open({
+    trigger_id: body.trigger_id,
+    view: fileABugModalPayload()
   })
 });
 
