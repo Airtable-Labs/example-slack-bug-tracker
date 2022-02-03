@@ -20,7 +20,14 @@ This repository began as a mirror of the [slackapi/bolt-js-getting-started-app](
 
 ## Running locally
 
-### 0. Create a new Slack App
+### 0. Setup or identify your "Bugs" table in Airtable
+
+The example code in this project expects your Airtable base's table to have the following fields: `Short description` (single line text), `Long description` (long text), `Priority` (single select), `Submitter Slack UID` (single line text), and `Submitter Slack Name` (single line text).
+
+You can copy [this sample table](https://airtable.com/shrUnY5ULVeIcOfFr) into your own base if you'd like. Pointers on how which code to modify to adapt this example are below. It's recommended you use this exact schema for your initial test of the example code.
+
+
+### 1. Create a new Slack App
 
 - Go to https://api.slack.com/apps
 - Click **Create App**
@@ -31,11 +38,28 @@ This repository began as a mirror of the [slackapi/bolt-js-getting-started-app](
 Once the app is created click **Install to Workspace** 
 Then scroll down in Basic Info and click **Generate Token and Scopes** with both scopes
 
-### 1. Setup environment variables
 
-Copy `.env.example` to `.env` and paste your unique values (there are comments in the file with where to find each value)
+### 2. Setup environment variables (and Airtable base)
 
-### 2. Setup your local project
+Copy `.env.example` to `.env` and paste your unique values. The environment variables you'll need to define are:
+
+```zsh
+## Slack...
+# Bot token from the 'OAuth & Permissions' > 'OAuth Tokens for Your Workspace' section of your Slack app config off of api.slack.com/apps
+SLACK_BOT_TOKEN=xoxb-...
+# App token from the 'Basic Information' > 'App-Level Tokens' section of your Slack app config off of api.slack.com/apps
+SLACK_APP_TOKEN=xapp-...
+
+## Airtable...
+# API key from https://airtable.com/account
+AIRTABLE_API_KEY=key...
+# Base ID from API docs or https://support.airtable.com/hc/en-us/articles/4405741487383
+AIRTABLE_BASE_ID=app...
+# Table ID from https://support.airtable.com/hc/en-us/articles/4405741487383
+AIRTABLE_TABLE_ID=tbl...
+```
+
+### 3. Setup your local project
 
 ```zsh
 # Clone this project onto your machine
@@ -48,16 +72,16 @@ cd example-slack-bug-tracker/
 npm install
 ```
 
-### 3. Start the server to listen for events from Slack
+### 4. Start the server to listen for events from Slack
 ```zsh
 npm run start
 ```
 
-### 4. Test
+### 5. Test
 
 Your app should be ready to try from Slack 🚀. Check out the Global Shortcut ⚡️, Message Shortcut 💬, and App Home 🏡!
 
-### 5. Iterate and develop
+### 6. Iterate and develop
 - You can run `npm run watch` (instead of `npm run start`) to have `nodemon` watch code files for changes and automatically restart the server for a quicker iterating.
 - To change the fields in the form, update `views/modals.js` and `views/message.js` to include valid Block Kit JSON (as Node objects) and update the `app.shortcut` listeners in `app.js` to expect and use the new Slack BlockKit `block_ids` and `action_ids`
 
