@@ -115,8 +115,8 @@ app.view('fileABugModal', async ({ ack, body, view, client, logger }) => {
     let reactionToAdd = ''
     try {
       const newRecord = await airtableTable.create([{ fields: newRecordFields }])
-      const newRecordUrl = newRecord[0].get('AT Record URL')
-      updateToSubmitter = `:white_check_mark: Your bug report has been submitted. You can view it <${newRecordUrl}|here>`
+      const newRecordId = newRecord[0].getId()
+      updateToSubmitter = `:white_check_mark: Your bug report has been submitted. You can view it at <https://airtable.com/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_TABLE_ID}/${newRecordId}|here>`
       reactionToAdd = 'white_check_mark'
     } catch (error) {
       updateToSubmitter = `:x: <@${body.user.id}> Sorry, but an error occured while sending your report to Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)}\`\`\``
