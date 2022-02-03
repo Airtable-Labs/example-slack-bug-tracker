@@ -14,6 +14,11 @@ This app has a few entry points and features to help you quickly send informatio
 | **2. Message Shortcut** 💬<br> You can also open the form by acting on a message using the [Message Shortcut](https://slack.com/help/articles/360004063011-Work-with-apps-in-Slack-using-shortcuts#message-shortcuts). The message you selected will be used to populate the details text area. 	| [![](docs/message_shortcut.gif)](docs/message_shortcut.gif) |
 | **3. App Home** 🏡<br> The app's [App Home](https://api.slack.com/surfaces/tabs) provides buttons to file a new bug or open the Airtable base in a browser window/tab.	| [![](docs/app_home.png)](docs/app_home.png) |
 
+---
+
+The software made available from this repository is not supported by Formagrid Inc (Airtable) or part of the Airtable Service. It is made available on an "as is" basis and provided without express or implied warranties of any kind.
+
+---
 
 ## History/Credit
 This repository began as a mirror of the [slackapi/bolt-js-getting-started-app](https://github.com/slackapi/bolt-js-getting-started-app) which can still be found on [this branch](https://github.com/airtable-labs/example-slack-bug-tracker/tree/original-from_bolt-js-getting-started-app). The blog post accompanying the original code can be found [here](https://slack.dev/bolt-js/tutorial/getting-started).
