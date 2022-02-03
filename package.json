@@ -1,5 +1,5 @@
 {
-  "name": "slack-form-to-airtable",
+  "name": "example-slack-bug-tracker",
   "version": "0.0.1",
   "description": "A Slack app with a form that saves responses to an Airtable base",
   "main": "app.js",

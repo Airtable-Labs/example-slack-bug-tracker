@@ -1,4 +1,4 @@
-# Send Slack form submissions to Airtable
+# Example Airtable+Slack App: Bug Tracker
 
 ## Overview
 
@@ -16,7 +16,7 @@ This app has a few entry points and features to help you quickly send informatio
 
 
 ## History/Credit
-This repository began as a mirror of the [slackapi/bolt-js-getting-started-app](https://github.com/slackapi/bolt-js-getting-started-app) which can still be found on [this branch](https://github.com/marks/slack-form-to-airtable/tree/original-from_bolt-js-getting-started-app). The blog post accompanying the original code can be found [here](https://slack.dev/bolt-js/tutorial/getting-started).
+This repository began as a mirror of the [slackapi/bolt-js-getting-started-app](https://github.com/slackapi/bolt-js-getting-started-app) which can still be found on [this branch](https://github.com/marks/example-slack-bug-tracker/tree/original-from_bolt-js-getting-started-app). The blog post accompanying the original code can be found [here](https://slack.dev/bolt-js/tutorial/getting-started).
 
 ## Running locally
 
@@ -39,10 +39,10 @@ Copy `.env.example` to `.env` and paste your unique values (there are comments i
 
 ```zsh
 # Clone this project onto your machine
-git clone https://github.com/airtable-labs/slack-form-to-airtable.git
+git clone https://github.com/airtable-labs/example-slack-bug-tracker.git
 
 # Change directory into the project
-cd slack-form-to-airtable/
+cd example-slack-bug-tracker/
 
 # Install dependencies
 npm install

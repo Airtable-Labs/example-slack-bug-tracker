@@ -1,5 +1,5 @@
 display_information:
-  name: Slack Form to Airtable (dev local)
+  name: Example Bug Tracker (dev local)
 features:
   bot_user:
     display_name: File a bug (dev local)

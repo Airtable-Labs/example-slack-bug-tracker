@@ -49,7 +49,7 @@ const blocksForAppHome = function (airtableBaseId, airtableTableId) {
       elements: [
         {
           type: 'mrkdwn',
-          text: 'Learn more about this Airtable integration example at https://github.com/airtable-labs/slack-form-to-airtable'
+          text: 'Learn more about this Airtable integration example at https://github.com/airtable-labs/example-slack-bug-tracker'
         }
       ]
     }
