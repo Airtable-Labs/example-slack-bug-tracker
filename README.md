@@ -24,7 +24,7 @@ The software made available from this repository is not supported by Formagrid I
 
 ### 0. Setup or identify your "Bugs" table in Airtable
 
-The example code in this project expects the Airtable table you specify (in the next step) to have the following fields: `Short description` (single line text), `Long description` (long text), `Priority` (single select), `Submitter Slack UID` (single line text), and `Submitter Slack Name` (single line text).
+The example code in this project expects the Airtable table you specify (in the next step) to have the following fields: `Short description` (single line text), `Long description` (long text), `Priority` (single select), `Submitter Slack UID` (single line text), `Submitter Slack Name` (single line text), `Updater Slack UID` (single line text), and `Updater Slack Name` (single line text).
 
 You can copy [this sample table](https://airtable.com/shrUnY5ULVeIcOfFr) into your own base if you'd like. Pointers on how which code to modify to adapt this example are below. It's recommended you use this exact schema for your initial test of the example code.
 
