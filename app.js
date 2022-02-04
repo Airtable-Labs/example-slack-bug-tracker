@@ -1,6 +1,5 @@
-// Load environment variables from your .env file (if it exists)
-require('dotenv').config()
-
+// Load validated Config object from config.js (which uses dotenv to read from the local .env file)
+const { Config } = require('./config')
 // Load Bolt app, a Slack application framework which wraps Express
 const { App } = require('@slack/bolt')
 
@@ -21,15 +20,15 @@ see: https://slack.dev/bolt-js/tutorial/getting-started
 // Initializes your app with your bot token and app token
 const app = new App({
   socketMode: true,
-  token: process.env.SLACK_BOT_TOKEN,
-  appToken: process.env.SLACK_APP_TOKEN,
-  logLevel: process.env.LOG_LEVEL || 'debug'
+  token: Config.SLACK_BOT_TOKEN,
+  appToken: Config.SLACK_APP_TOKEN,
+  logLevel: Config.LOG_LEVEL || 'debug'
 })
 
 // Initialize Airtable client
-const airtableClient = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY })
-const airtableBase = airtableClient.base(process.env.AIRTABLE_BASE_ID)
-const airtableTable = airtableBase(process.env.AIRTABLE_TABLE_ID)
+const airtableClient = new Airtable({ apiKey: Config.AIRTABLE_API_KEY })
+const airtableBase = airtableClient.base(Config.AIRTABLE_BASE_ID)
+const airtableTable = airtableBase(Config.AIRTABLE_TABLE_ID)
 
 // Listen for 'File a bug' global shortcut
 app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client }) => {
@@ -116,7 +115,7 @@ app.view('fileABugModal', async ({ ack, body, view, client, logger }) => {
     try {
       const newRecord = await airtableTable.create([{ fields: newRecordFields }])
       const newRecordId = newRecord[0].getId()
-      updateToSubmitter = `:white_check_mark: Your bug report has been submitted. You can view it at <https://airtable.com/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_TABLE_ID}/${newRecordId}|here>`
+      updateToSubmitter = `:white_check_mark: Your bug report has been submitted. You can view it at <https://airtable.com/${Config.AIRTABLE_BASE_ID}/${Config.AIRTABLE_TABLE_ID}/${newRecordId}|here>`
       reactionToAdd = 'white_check_mark'
     } catch (error) {
       updateToSubmitter = `:x: <@${body.user.id}> Sorry, but an error occured while sending your report to Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)}\`\`\``
@@ -151,7 +150,7 @@ app.event('app_home_opened', async ({ event, client }) => {
     user_id: event.user,
     view: {
       type: 'home',
-      blocks: blocksForAppHome(process.env.AIRTABLE_BASE_ID, process.env.AIRTABLE_TABLE_ID)
+      blocks: blocksForAppHome(Config.AIRTABLE_BASE_ID, Config.AIRTABLE_TABLE_ID)
     }
   })
 })
