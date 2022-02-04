@@ -52,7 +52,7 @@ app.shortcut('fileABugMessageShortcut', async ({ ack, shortcut, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: modalBlocks.newBug(shortcut.message.text)
+    view: modalBlocks.newBug({ description: shortcut.message.text })
   })
 })
 
@@ -179,6 +179,26 @@ app.action('delete_record', async ({ ack, action, respond, body, logger }) => {
     delete_original: true,
     response_type: 'in_channel',
     thread_ts: body.message.thread_ts
+  })
+})
+
+// Listen for users clicking the 'Edit' button from their DMs
+app.action('edit_record', async ({ ack, action, client, body }) => {
+  await ack()
+
+  // Retrieve latest record values from Airtable
+  const recordId = action.value
+  const recordBeforeEditing = await airtableTable.find(recordId)
+
+  // Open modal and prefill values
+  await client.views.open({
+    trigger_id: body.trigger_id,
+    view: modalBlocks.updateBug({
+      title: recordBeforeEditing.get('Short description'),
+      description: recordBeforeEditing.get('Long description'),
+      priority: recordBeforeEditing.get('Priority'),
+      recordId
+    })
   })
 });
 

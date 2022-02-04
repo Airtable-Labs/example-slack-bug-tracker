@@ -1,4 +1,4 @@
-const bugFormFields = function (title = '', priority = null, description = '') {
+const bugFormFields = function ({ title, priority, description }) {
   return [
     {
       block_id: 'block_title',
@@ -83,7 +83,7 @@ const bugFormFields = function (title = '', priority = null, description = '') {
   ]
 }
 
-const newBug = function (title = '', priority = null, description = '') {
+const newBug = function ({ description }) {
   return {
     type: 'modal',
     callback_id: 'create_bug',
@@ -98,7 +98,7 @@ const newBug = function (title = '', priority = null, description = '') {
     },
     title: {
       type: 'plain_text',
-      text: 'File a new bug  (dev local)'
+      text: 'File new bug (dev local)'
     },
     blocks: [
       {
@@ -112,11 +112,47 @@ const newBug = function (title = '', priority = null, description = '') {
       {
         type: 'divider'
       },
-      ...bugFormFields(title, priority, description)
+      ...bugFormFields({ description })
+    ]
+  }
+}
+
+const updateBug = function ({ title, priority, description, recordId }) {
+  return {
+    type: 'modal',
+    callback_id: 'update_bug',
+    private_metadata: recordId,
+    submit: {
+      type: 'plain_text',
+      text: 'Update :rocket:',
+      emoji: true
+    },
+    close: {
+      type: 'plain_text',
+      text: 'Cancel'
+    },
+    title: {
+      type: 'plain_text',
+      text: 'Update bug (dev local)'
+    },
+    blocks: [
+      {
+        block_id: 'form_description',
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: 'Use this form to update the bug report.\n\nNote that the values displayed here are the latest values and may differ from when you originally submitted your report.'
+        }
+      },
+      {
+        type: 'divider'
+      },
+      ...bugFormFields({ title, priority, description })
     ]
   }
 }
 
 module.exports = {
-  newBug
+  newBug,
+  updateBug
 }
