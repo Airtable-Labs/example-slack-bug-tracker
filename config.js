@@ -30,6 +30,8 @@ const Config = envalid.cleanEnv(process.env, {
   LOG_LEVEL: envalid.str({ default: 'info', choices: ['debug', 'info', 'warn', 'error'] })
 })
 
+console.log('✅ Environment variables validated & loaded')
+
 module.exports = {
   Config
 }
