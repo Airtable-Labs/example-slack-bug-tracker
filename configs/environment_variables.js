@@ -27,7 +27,7 @@ const nonEmptyString = envalid.makeValidator((v) => {
 
 // Define validation schema for environment variables
 // For information about each variable, see the comments in .env.example
-const Config = envalid.cleanEnv(process.env, {
+const EnvVars = envalid.cleanEnv(process.env, {
   SLACK_BOT_TOKEN: nonEmptyStringStartsWith('xoxb-'),
   SLACK_APP_TOKEN: nonEmptyStringStartsWith('xapp-'),
 
@@ -42,5 +42,5 @@ const Config = envalid.cleanEnv(process.env, {
 console.log('✅ Environment variables validated & loaded')
 
 module.exports = {
-  Config
+  EnvVars
 }

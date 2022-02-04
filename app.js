@@ -1,5 +1,5 @@
 // Load validated Config object from config.js (which uses dotenv to read from the local .env file)
-const { Config } = require('./config')
+const { EnvVars } = require('./configs/environment_variables')
 
 // Load Bolt app, a Slack application framework which wraps Express
 const { App } = require('@slack/bolt')
@@ -21,15 +21,15 @@ see: https://slack.dev/bolt-js/tutorial/getting-started
 // Initializes your app with your bot token and app token
 const app = new App({
   socketMode: true,
-  token: Config.SLACK_BOT_TOKEN,
-  appToken: Config.SLACK_APP_TOKEN,
-  logLevel: Config.LOG_LEVEL || 'debug'
+  token: EnvVars.SLACK_BOT_TOKEN,
+  appToken: EnvVars.SLACK_APP_TOKEN,
+  logLevel: EnvVars.LOG_LEVEL || 'debug'
 })
 
 // Initialize Airtable client
-const airtableClient = new Airtable({ apiKey: Config.AIRTABLE_API_KEY })
-const airtableBase = airtableClient.base(Config.AIRTABLE_BASE_ID)
-const airtableTable = airtableBase(Config.AIRTABLE_TABLE_ID)
+const airtableClient = new Airtable({ apiKey: EnvVars.AIRTABLE_API_KEY })
+const airtableBase = airtableClient.base(EnvVars.AIRTABLE_BASE_ID)
+const airtableTable = airtableBase(EnvVars.AIRTABLE_TABLE_ID)
 
 // == HELPER FUNCTIONS ==
 // Extract values from view submission payload and validate them
@@ -125,7 +125,7 @@ app.view('create_record_submission', async ({ ack, body, view, client, logger })
     try {
       const newRecord = await airtableTable.create([{ fields: newRecordFields }])
       const newRecordId = newRecord[0].getId()
-      updateToSubmitter = messageBlocks.successfullySavedToAirtable(Config.AIRTABLE_BASE_ID, Config.AIRTABLE_TABLE_ID, newRecordId)
+      updateToSubmitter = messageBlocks.successfullySavedToAirtable(EnvVars.AIRTABLE_BASE_ID, EnvVars.AIRTABLE_TABLE_ID, newRecordId)
     } catch (error) {
       updateToSubmitter = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while sending your record details to Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
     }
@@ -148,7 +148,7 @@ app.event('app_home_opened', async ({ event, client }) => {
     user_id: event.user,
     view: {
       type: 'home',
-      blocks: appHomeBlocks(Config.AIRTABLE_BASE_ID, Config.AIRTABLE_TABLE_ID)
+      blocks: appHomeBlocks(EnvVars.AIRTABLE_BASE_ID, EnvVars.AIRTABLE_TABLE_ID)
     }
   })
 })
@@ -182,7 +182,7 @@ app.action('delete_record', async ({ ack, action, respond, body, logger }) => {
     const recordBeforeDeletion = await airtableTable.find(recordId)
     await recordBeforeDeletion.destroy()
     logger.debug({ recordBeforeDeletion })
-    blocks = messageBlocks.simpleMessage(`Record \`${recordBeforeDeletion.get(Config.AIRTABLE_PRIMARY_FIELD_NAME)}\` (${recordId}) was successfully deleted. \n\nYou can recover deleted records from your <https://support.airtable.com/hc/en-us/articles/115014104628-Base-trash|base trash> for a limited amount of time.`)
+    blocks = messageBlocks.simpleMessage(`Record \`${recordBeforeDeletion.get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)}\` (${recordId}) was successfully deleted. \n\nYou can recover deleted records from your <https://support.airtable.com/hc/en-us/articles/115014104628-Base-trash|base trash> for a limited amount of time.`)
   } catch (error) {
     blocks = messageBlocks.simpleMessage(`<@${body.user.id}> There was an error deleting this record (it may have been already deleted by someone else): \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
   }
@@ -259,9 +259,9 @@ app.view('update_record_submission', async ({ ack, body, view, client, logger })
     let updateToSubmitter = ''
     try {
       await airtableTable.update(recordId, fieldsToUpdate)
-      updateToSubmitter = messageBlocks.simpleMessage(`:white_check_mark: Your <https://airtable.com/${Config.AIRTABLE_BASE_ID}/${Config.AIRTABLE_TABLE_ID}/${recordId}|record> has been updated.`)
+      updateToSubmitter = messageBlocks.simpleMessage(`:white_check_mark: Your <https://airtable.com/${EnvVars.AIRTABLE_BASE_ID}/${EnvVars.AIRTABLE_TABLE_ID}/${recordId}|record> has been updated.`)
     } catch (error) {
-      updateToSubmitter = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while updating your <https://airtable.com/${Config.AIRTABLE_BASE_ID}/${Config.AIRTABLE_TABLE_ID}/${recordId}|record> details in Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
+      updateToSubmitter = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while updating your <https://airtable.com/${EnvVars.AIRTABLE_BASE_ID}/${EnvVars.AIRTABLE_TABLE_ID}/${recordId}|record> details in Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
     }
 
     // Thread update to DM thread
