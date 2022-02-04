@@ -120,7 +120,6 @@ app.view('create_record_submission', async ({ ack, body, view, client, logger })
 
   // If there are errors, respond to Slack with errors; otherwise, respond with a confirmation
   if (Object.keys(errors).length > 0) {
-    console.warn('errors: ', errors)
     await ack({
       response_action: 'errors',
       errors
@@ -267,7 +266,6 @@ app.view('update_record_submission', async ({ ack, body, view, client, logger })
 
   // If there are errors, respond to Slack with errors; otherwise, respond with a confirmation
   if (Object.keys(errors).length > 0) {
-    console.warn('errors: ', errors)
     await ack({
       response_action: 'errors',
       errors
