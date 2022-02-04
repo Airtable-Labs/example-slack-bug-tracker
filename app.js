@@ -209,15 +209,74 @@ app.action('edit_record', async ({ ack, action, client, body }) => {
   await client.views.open({
     trigger_id: body.trigger_id,
     view: modalBlocks.updateBug({
+      privateMetadata: JSON.stringify({ recordId, channelId: body.channel.id, threadTs: body.message.thread_ts }),
+      // TODO - refactor to not use literal strings for Airtable field names
       title: recordBeforeEditing.get('Short description'),
       description: recordBeforeEditing.get('Long description'),
-      priority: recordBeforeEditing.get('Priority'),
-      recordId
+      priority: recordBeforeEditing.get('Priority')
     })
   })
-});
+})
 
-(async () => {
+// Listen for form/modal submission
+app.view('update_bug', async ({ ack, body, view, client, logger }) => {
+  // Extract user-submitted values from view submission object
+  const privateMetadataAsString = view.private_metadata
+  const { recordId, channelId, threadTs } = JSON.parse(privateMetadataAsString)
+
+  // Extract values from view submission payload and validate them/generate errors
+  const { title, priority, description } = await extractInputsFromViewSubmissionPayload({ view })
+  const errors = validateInputs({ title, priority, description })
+  logger.debug({ title, priority, description, errors })
+
+  // If there are errors, respond to Slack with errors; otherwise, respond with a confirmation
+  if (Object.keys(errors).length > 0) {
+    console.warn('errors: ', errors)
+    await ack({
+      response_action: 'errors',
+      errors
+    })
+  } else {
+    // If there are no errors, close the modal and update the thread
+    await ack()
+
+    // TODO add information about the updated fields values
+    await client.chat.postMessage({
+      channel: channelId,
+      thread_ts: threadTs,
+      text: `Your request to update this record (${recordId}) has been received and is being processed.`
+    })
+
+    // Update Airtable record
+    // TODO - refactor to not use literal strings for Airtable field names
+    const fieldsToUpdate = {
+      'Short description': title,
+      'Long description': description,
+      Priority: priority
+    }
+
+    // Depending on success/failure from Airtable API, update DM to submitter
+    let updateToSubmitter = ''
+    try {
+      await airtableTable.update(recordId, fieldsToUpdate)
+      updateToSubmitter = messageBlocks.simpleMessage(`:white_check_mark: Your <https://airtable.com/${Config.AIRTABLE_BASE_ID}/${Config.AIRTABLE_TABLE_ID}/${recordId}|record> has been updated.`)
+    } catch (error) {
+      updateToSubmitter = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while updating your <https://airtable.com/${Config.AIRTABLE_BASE_ID}/${Config.AIRTABLE_TABLE_ID}/${recordId}|record> details in Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
+    }
+
+    // Thread update to DM thread
+    await client.chat.postMessage({
+      channel: channelId,
+      thread_ts: threadTs,
+      blocks: updateToSubmitter,
+      unfurl_links: false,
+      reply_broadcast: true // send threaded reply to channel
+    })
+  }
+})
+
+// == START SLACK APP SERVER ==
+;(async () => {
   // Test connection to Airtable before starting Bolt
   try {
     await airtableTable.select({ maxRecords: 1 }).all()

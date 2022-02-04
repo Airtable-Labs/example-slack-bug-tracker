@@ -117,11 +117,11 @@ const newBug = function ({ description }) {
   }
 }
 
-const updateBug = function ({ title, priority, description, recordId }) {
+const updateBug = function ({ title, priority, description, privateMetadata }) {
   return {
     type: 'modal',
     callback_id: 'update_bug',
-    private_metadata: recordId,
+    private_metadata: privateMetadata,
     submit: {
       type: 'plain_text',
       text: 'Update :rocket:',
