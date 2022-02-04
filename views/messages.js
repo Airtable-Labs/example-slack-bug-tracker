@@ -1,12 +1,8 @@
 const initialMessageToSubmitter = function (fieldsWithValues) {
-  const slackFields = []
-  for (const fieldName of Object.keys(fieldsWithValues)) {
+  const fields = Object.keys(fieldsWithValues).map(fieldName => {
     const fieldWithValue = fieldsWithValues[fieldName]
-    slackFields.push({
-      type: 'mrkdwn',
-      text: `*${fieldWithValue.slackInputLabel}:*\n${fieldWithValue.value}`
-    })
-  }
+    return slackSectionFieldGenerator(fieldWithValue.slackInputLabel, fieldWithValue.value)
+  })
 
   return [
     {
@@ -18,11 +14,17 @@ const initialMessageToSubmitter = function (fieldsWithValues) {
     },
     {
       type: 'section',
-      fields: slackFields
+      fields
     }
   ]
 }
 
+const slackSectionFieldGenerator = (key, value) => {
+  return {
+    type: 'mrkdwn',
+    text: `*${key}:*\n${value}`
+  }
+}
 const successfullySavedToAirtable = function (baseId, tableId, recordId, recordPrimaryFieldValue) {
   return [
     {
