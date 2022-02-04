@@ -112,7 +112,7 @@ app.view('fileABugModal', async ({ ack, body, view, client, logger }) => {
       const newRecordId = newRecord[0].getId()
       updateToSubmitter = messageBlocks.successfullySavedToAirtable(Config.AIRTABLE_BASE_ID, Config.AIRTABLE_TABLE_ID, newRecordId)
     } catch (error) {
-      updateToSubmitter = messageBlocks.errorMessage(error)
+      updateToSubmitter = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while sending your record details to Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
     }
 
     // Thread update to DM thread
@@ -154,6 +154,33 @@ app.action('file_a_bug', async ({ ack, body, client }) => {
 //   Without this, Slack will show a /!\ warning icon next to buttons
 app.action('url_button', async ({ ack }) => {
   await ack()
+})
+
+// Listen for users clicking a button that opens a URL
+//   Without this, Slack will show a /!\ warning icon next to buttons
+app.action('delete_record', async ({ ack, action, respond, body, logger }) => {
+  await ack()
+  const recordId = action.value
+
+  // Attempt to delete record from Airtable
+  let blocks = []
+  try {
+    const recordBeforeDeletion = await airtableTable.find(recordId)
+    await recordBeforeDeletion.destroy()
+    logger.debug({ recordBeforeDeletion })
+    blocks = messageBlocks.simpleMessage(`Record \`${recordBeforeDeletion.get(Config.AIRTABLE_PRIMARY_FIELD_NAME)}\` (${recordId}) was successfully deleted. \n\nYou can recover deleted records from your <https://support.airtable.com/hc/en-us/articles/115014104628-Base-trash|base trash> for a limited amount of time.`)
+  } catch (error) {
+    blocks = messageBlocks.simpleMessage(`<@${body.user.id}> There was an error deleting this record (it may have been already deleted by someone else): \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
+  }
+
+  // Respond by deleting the original message and adding a new message to the thread
+  await respond({
+    blocks,
+    replace_original: false,
+    delete_original: true,
+    response_type: 'in_channel',
+    thread_ts: body.message.thread_ts
+  })
 });
 
 (async () => {
