@@ -148,6 +148,12 @@ app.action('file_a_bug', async ({ ack, body, client }) => {
     trigger_id: body.trigger_id,
     view: modalBlocks.fileABug()
   })
+})
+
+// Listen for users clicking a button that opens a URL
+//   Without this, Slack will show a /!\ warning icon next to buttons
+app.action('url_button', async ({ ack }) => {
+  await ack()
 });
 
 (async () => {

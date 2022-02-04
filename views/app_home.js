@@ -27,6 +27,7 @@ const simpleAppHome = function (airtableBaseId, airtableTableId) {
             text: ':link: Visit Airtable base',
             emoji: true
           },
+          action_id: 'url_button',
           url: `https://airtable.com/${airtableBaseId}/${airtableTableId}`
         }
       ]
