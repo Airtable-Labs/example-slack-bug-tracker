@@ -17,7 +17,7 @@ Fields.set('priority', {
 })
 
 Fields.set('long_description', {
-  airtableFieldName: 'Short description',
+  airtableFieldName: 'Long description',
   slackInputLabel: 'Description',
   slackElementType: 'plain_text_input',
   slackElementMultiLine: true,
