@@ -1,6 +1,6 @@
 // Load validated Config object from config.js (which uses dotenv to read from the local .env file)
 const { EnvVars } = require('./configs/environment_variables')
-const { Fields } = require('./configs/fields')
+const { Fields, SystemFields } = require('./configs/fields')
 
 // Load Bolt app, a Slack application framework which wraps Express
 const { App } = require('@slack/bolt')
@@ -88,8 +88,8 @@ app.view('create_record_submission', async ({ ack, body, view, client, logger })
     // Start with fields that are not editable by Slack users
     // TODO - refactor to not use literal strings for Airtable field names
     const newRecordFields = {
-      'Submitter Slack UID': body.user.id,
-      'Submitter Slack Name': body.user.name
+      [SystemFields.get('submitter_slack_uid').airtableFieldName]: body.user.id,
+      [SystemFields.get('submitter_slack_name').airtableFieldName]: body.user.name
     }
     // Add fields from view submission payload
     Object.keys(fieldsWithValues).forEach((fieldName) => {
@@ -236,8 +236,8 @@ app.view('update_record_submission', async ({ ack, body, view, client, logger })
 
     // Determine payload for Airtable record update
     const fieldsToUpdate = {
-      'Updater Slack UID': body.user.id,
-      'Updater Slack Name': body.user.name
+      [SystemFields.get('updater_slack_uid').airtableFieldName]: body.user.id,
+      [SystemFields.get('updater_slack_uid').airtableFieldName]: body.user.name
     }
     Object.keys(fieldsWithValues).forEach((fieldName) => {
       const fieldWithValue = fieldsWithValues[fieldName]

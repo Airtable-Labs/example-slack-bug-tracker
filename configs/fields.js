@@ -46,9 +46,24 @@ Fields.set('long_description', {
       return true
     }
   }
+})
 
+// These system fields are meant to be used by the app and are not shown to the user
+const SystemFields = new Map()
+SystemFields.set('submitter_slack_uid', {
+  airtableFieldName: 'Submitter Slack UID'
+})
+SystemFields.set('submitter_slack_name', {
+  airtableFieldName: 'Submitter Slack Name'
+})
+SystemFields.set('updater_slack_name', {
+  airtableFieldName: 'Updater Slack Name'
+})
+SystemFields.set('updater_slack_uid', {
+  airtableFieldName: 'Updater Slack UID'
 })
 
 module.exports = {
-  Fields
+  Fields,
+  SystemFields
 }
