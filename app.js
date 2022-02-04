@@ -9,7 +9,7 @@ const Airtable = require('airtable')
 
 // Load helper functions
 const { fileABugModalPayload } = require('./views/modals')
-const { messageToSubmitter } = require('./views/messages')
+const { initialMessageToSubmitter } = require('./views/messages')
 const { blocksForAppHome } = require('./views/app_home')
 
 /*

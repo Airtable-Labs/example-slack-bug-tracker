@@ -1,4 +1,4 @@
-const messageToSubmitter = function (title, priority) {
+const initialMessageToSubmitter = function (title, priority) {
   return [
     {
       type: 'section',
@@ -24,5 +24,5 @@ const messageToSubmitter = function (title, priority) {
 }
 
 module.exports = {
-  messageToSubmitter
+  messageToSubmitter: initialMessageToSubmitter
 }
