@@ -1,5 +1,6 @@
 // Load validated Config object from config.js (which uses dotenv to read from the local .env file)
 const { Config } = require('./config')
+
 // Load Bolt app, a Slack application framework which wraps Express
 const { App } = require('@slack/bolt')
 
