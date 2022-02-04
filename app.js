@@ -86,14 +86,9 @@ app.view('fileABugModal', async ({ ack, body, view, client, logger }) => {
     const dmToSubmitter = await client.chat.postMessage({
       channel: body.user.id,
       text: 'Thanks for your bug report! We will triage it ASAP.',
-      blocks: messageToSubmitter(title, priority)
+      blocks: initialMessageToSubmitter(title, priority)
     })
-    // Add work-in-progress reaction
-    await client.reactions.add({
-      channel: dmToSubmitter.channel,
-      name: 'construction',
-      timestamp: dmToSubmitter.ts
-    })
+
     // Thread full description to DM thread (in case submission fails)
     await client.chat.postMessage({
       channel: dmToSubmitter.channel,
@@ -112,34 +107,20 @@ app.view('fileABugModal', async ({ ack, body, view, client, logger }) => {
 
     // Depending on success/failure from Airtable API, update DM to submitter
     let updateToSubmitter = ''
-    let reactionToAdd = ''
     try {
       const newRecord = await airtableTable.create([{ fields: newRecordFields }])
       const newRecordId = newRecord[0].getId()
       updateToSubmitter = `:white_check_mark: Your bug report has been submitted. You can view it at <https://airtable.com/${Config.AIRTABLE_BASE_ID}/${Config.AIRTABLE_TABLE_ID}/${newRecordId}|here>`
-      reactionToAdd = 'white_check_mark'
     } catch (error) {
       updateToSubmitter = `:x: <@${body.user.id}> Sorry, but an error occured while sending your report to Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)}\`\`\``
-      reactionToAdd = 'x'
     }
 
     // Thread update to DM thread
     await client.chat.postMessage({
       channel: dmToSubmitter.channel,
       thread_ts: dmToSubmitter.ts,
-      text: updateToSubmitter
-    })
-
-    // Add reaction to DM thread (and remove work-in-progress reaction)
-    await client.reactions.add({
-      channel: dmToSubmitter.channel,
-      name: reactionToAdd,
-      timestamp: dmToSubmitter.ts
-    })
-    await client.reactions.remove({
-      channel: dmToSubmitter.channel,
-      name: 'construction',
-      timestamp: dmToSubmitter.ts
+      text: updateToSubmitter,
+      reply_broadcast: true // send threaded reply to channel
     })
   }
 })

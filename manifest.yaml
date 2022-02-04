@@ -22,7 +22,6 @@ oauth_config:
     bot:
       - commands
       - chat:write
-      - reactions:write
 settings:
   event_subscriptions:
     bot_events:
