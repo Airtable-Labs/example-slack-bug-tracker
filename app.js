@@ -40,7 +40,7 @@ app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: modalBlocks.fileABug()
+    view: modalBlocks.fileANewBug()
   })
 })
 
@@ -52,7 +52,7 @@ app.shortcut('fileABugMessageShortcut', async ({ ack, shortcut, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: modalBlocks.fileABug(shortcut.message.text)
+    view: modalBlocks.fileANewBug(shortcut.message.text)
   })
 })
 
@@ -146,7 +146,7 @@ app.action('file_a_bug', async ({ ack, body, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: body.trigger_id,
-    view: modalBlocks.fileABug()
+    view: modalBlocks.fileANewBug()
   })
 })
 
