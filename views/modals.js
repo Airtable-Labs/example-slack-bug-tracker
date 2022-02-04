@@ -1,4 +1,4 @@
-const bugFormFields = function ({ title, priority, description }) {
+const recordFormFields = function ({ title, priority, description }) {
   return [
     {
       block_id: 'block_title',
@@ -83,10 +83,10 @@ const bugFormFields = function ({ title, priority, description }) {
   ]
 }
 
-const newBug = function ({ description }) {
+const newRecord = function ({ description }) {
   return {
     type: 'modal',
-    callback_id: 'create_bug',
+    callback_id: 'create_record_submission',
     submit: {
       type: 'plain_text',
       text: 'Submit :rocket:',
@@ -112,15 +112,15 @@ const newBug = function ({ description }) {
       {
         type: 'divider'
       },
-      ...bugFormFields({ description })
+      ...recordFormFields({ description })
     ]
   }
 }
 
-const updateBug = function ({ title, priority, description, privateMetadata }) {
+const updateRecord = function ({ title, priority, description, privateMetadata }) {
   return {
     type: 'modal',
-    callback_id: 'update_bug',
+    callback_id: 'update_record_submission',
     private_metadata: privateMetadata,
     submit: {
       type: 'plain_text',
@@ -147,12 +147,12 @@ const updateBug = function ({ title, priority, description, privateMetadata }) {
       {
         type: 'divider'
       },
-      ...bugFormFields({ title, priority, description })
+      ...recordFormFields({ title, priority, description })
     ]
   }
 }
 
 module.exports = {
-  newBug,
-  updateBug
+  newRecord,
+  updateRecord
 }

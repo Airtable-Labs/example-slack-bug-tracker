@@ -17,7 +17,7 @@ const simpleAppHome = function (airtableBaseId, airtableTableId) {
             text: ':new: File a new bug',
             emoji: true
           },
-          action_id: 'file_a_bug',
+          action_id: 'create_record',
           style: 'primary'
         },
         {

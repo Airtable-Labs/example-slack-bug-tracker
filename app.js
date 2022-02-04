@@ -55,7 +55,7 @@ const validateInputs = ({ title, priority, description }) => {
 
 // == SLACK BOLT LISTENERS ==
 // Listen for 'File a bug' global shortcut
-app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client }) => {
+app.shortcut('create_record_from_global_shortcut', async ({ shortcut, ack, client }) => {
   // Acknowledge shortcut request
   await ack()
 
@@ -63,24 +63,24 @@ app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: modalBlocks.newBug({})
+    view: modalBlocks.newRecord({})
   })
 })
 
 // Listen for 'File a bug' message shortcut
-app.shortcut('fileABugMessageShortcut', async ({ ack, shortcut, client }) => {
+app.shortcut('create_record_from_message_shortcut', async ({ ack, shortcut, client }) => {
   await ack()
 
   // Open modal using WebClient passed in from middleware.
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: modalBlocks.newBug({ description: shortcut.message.text })
+    view: modalBlocks.newRecord({ description: shortcut.message.text })
   })
 })
 
 // Listen for form/modal submission
-app.view('create_bug', async ({ ack, body, view, client, logger }) => {
+app.view('create_record_submission', async ({ ack, body, view, client, logger }) => {
   // Extract values from view submission payload and validate them/generate errors
   const { title, priority, description } = await extractInputsFromViewSubmissionPayload({ view })
   const errors = validateInputs({ title, priority, description })
@@ -154,14 +154,14 @@ app.event('app_home_opened', async ({ event, client }) => {
 })
 
 // Listen for users clicking the 'File a bug' button from App Home
-app.action('file_a_bug', async ({ ack, body, client }) => {
+app.action('create_record', async ({ ack, body, client }) => {
   await ack()
 
   // Open modal using WebClient passed in from middleware.
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: body.trigger_id,
-    view: modalBlocks.newBug({})
+    view: modalBlocks.newRecord({})
   })
 })
 
@@ -208,7 +208,7 @@ app.action('edit_record', async ({ ack, action, client, body }) => {
   // Open modal and prefill values
   await client.views.open({
     trigger_id: body.trigger_id,
-    view: modalBlocks.updateBug({
+    view: modalBlocks.updateRecord({
       privateMetadata: JSON.stringify({ recordId, channelId: body.channel.id, threadTs: body.message.thread_ts }),
       // TODO - refactor to not use literal strings for Airtable field names
       title: recordBeforeEditing.get('Short description'),
@@ -219,7 +219,7 @@ app.action('edit_record', async ({ ack, action, client, body }) => {
 })
 
 // Listen for form/modal submission
-app.view('update_bug', async ({ ack, body, view, client, logger }) => {
+app.view('update_record_submission', async ({ ack, body, view, client, logger }) => {
   // Extract user-submitted values from view submission object
   const privateMetadataAsString = view.private_metadata
   const { recordId, channelId, threadTs } = JSON.parse(privateMetadataAsString)
