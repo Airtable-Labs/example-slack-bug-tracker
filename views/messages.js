@@ -1,4 +1,13 @@
-const initialMessageToSubmitter = function (title, priority) {
+const initialMessageToSubmitter = function (fieldsWithValues) {
+  const slackFields = []
+  for (const fieldName of Object.keys(fieldsWithValues)) {
+    const fieldWithValue = fieldsWithValues[fieldName]
+    slackFields.push({
+      type: 'mrkdwn',
+      text: `*${fieldWithValue.slackInputLabel}:*\n${fieldWithValue.value}`
+    })
+  }
+
   return [
     {
       type: 'section',
@@ -9,27 +18,18 @@ const initialMessageToSubmitter = function (title, priority) {
     },
     {
       type: 'section',
-      fields: [
-        {
-          type: 'mrkdwn',
-          text: `*Title:*\n${title}`
-        },
-        {
-          type: 'mrkdwn',
-          text: `*Priority:*\n${priority}`
-        }
-      ]
+      fields: slackFields
     }
   ]
 }
 
-const successfullySavedToAirtable = function (baseId, tableId, recordId) {
+const successfullySavedToAirtable = function (baseId, tableId, recordId, recordPrimaryFieldValue) {
   return [
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `:white_check_mark: Your bug report has been submitted. You can view it at <https://airtable.com/${baseId}/${tableId}/${recordId}|here>`
+        text: `:white_check_mark: Your bug report has been saved to Airtable. The new record's primary field value is *${recordPrimaryFieldValue}* and the record ID is ${recordId}.`
       }
     },
     {

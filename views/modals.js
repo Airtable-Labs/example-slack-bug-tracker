@@ -1,89 +1,50 @@
-const recordFormFields = function ({ title, priority, description }) {
-  return [
-    {
-      block_id: 'block_title',
+// Generate array of input blocks based on Fields config
+const recordFormFields = function (fieldConfigsWithValuesMaybe) {
+  const inputBlocks = []
+  fieldConfigsWithValuesMaybe.forEach((fieldConfig, fieldName) => {
+    const inputBlock = {
+      block_id: fieldName,
       type: 'input',
       label: {
         type: 'plain_text',
-        text: 'Title'
+        text: fieldConfig.slackInputLabel
       },
       element: {
-        action_id: 'input_title',
-        type: 'plain_text_input',
-        initial_value: title
-      }
-    },
-    {
-      block_id: 'block_priority',
-      type: 'input',
-      label: {
-        type: 'plain_text',
-        text: 'Priority'
-      },
-      element: {
-        type: 'static_select',
-        action_id: 'input_priority',
-        placeholder: {
-          type: 'plain_text',
-          text: 'Select an item',
-          emoji: true
-        },
-        ...(priority && {
-          initial_option: {
-            value: priority,
-            text: {
-              type: 'plain_text',
-              text: priority
-            }
-          }
-        }
-        ),
-        options: [
-          {
-            text: {
-              type: 'plain_text',
-              text: 'High',
-              emoji: true
-            },
-            value: 'High'
-          },
-          {
-            text: {
-              type: 'plain_text',
-              text: 'Medium',
-              emoji: true
-            },
-            value: 'Medium'
-          },
-          {
-            text: {
-              type: 'plain_text',
-              text: 'Low',
-              emoji: true
-            },
-            value: 'Low'
-          }
-        ]
-      }
-    },
-    {
-      block_id: 'block_description',
-      type: 'input',
-      label: {
-        type: 'plain_text',
-        text: 'Long description'
-      },
-      element: {
-        action_id: 'input_description',
-        type: 'plain_text_input',
-        multiline: true,
-        initial_value: description
+        action_id: fieldName,
+        type: fieldConfig.slackElementType,
+        // If options are provided, use them
+        ...(fieldConfig.slackElementOptions && {
+          options: fieldConfig.slackElementOptions.map(slackSelectOption)
+        }),
+        // If multiLine is true, use a textarea
+        ...(fieldConfig.slackElementMultiLine && { multiline: true }),
+        // If the element type is plain_text_input and a value is set, use the initial value
+        ...(fieldConfig.slackElementType === 'plain_text_input' && fieldConfig.value && {
+          initial_value: fieldConfig.value
+        }),
+        // If the element type is static_select and a value is set, use the initial value
+        ...(fieldConfig.slackElementType === 'static_select' && fieldConfig.value && {
+          initial_option: slackSelectOption(fieldConfig.value)
+        })
       }
     }
-  ]
+    inputBlocks.push(inputBlock)
+  })
+  return inputBlocks
 }
 
-const createRecordForm = function ({ description }) {
+const slackSelectOption = function (value) {
+  return {
+    text: {
+      type: 'plain_text',
+      text: value,
+      emoji: true
+    },
+    value: value
+  }
+}
+
+const createRecordForm = function (fieldConfigsWithValuesMaybe) {
   return {
     type: 'modal',
     callback_id: 'create_record_submission',
@@ -112,12 +73,12 @@ const createRecordForm = function ({ description }) {
       {
         type: 'divider'
       },
-      ...recordFormFields({ description })
+      ...recordFormFields(fieldConfigsWithValuesMaybe)
     ]
   }
 }
 
-const updateRecordForm = function ({ title, priority, description, privateMetadata }) {
+const updateRecordForm = function (fieldConfigsWithValuesMaybe, privateMetadata) {
   return {
     type: 'modal',
     callback_id: 'update_record_submission',
@@ -147,7 +108,7 @@ const updateRecordForm = function ({ title, priority, description, privateMetada
       {
         type: 'divider'
       },
-      ...recordFormFields({ title, priority, description })
+      ...recordFormFields(fieldConfigsWithValuesMaybe)
     ]
   }
 }
