@@ -31,6 +31,29 @@ const airtableClient = new Airtable({ apiKey: Config.AIRTABLE_API_KEY })
 const airtableBase = airtableClient.base(Config.AIRTABLE_BASE_ID)
 const airtableTable = airtableBase(Config.AIRTABLE_TABLE_ID)
 
+// == HELPER FUNCTIONS ==
+// Extract values from view submission payload and validate them
+const extractInputsFromViewSubmissionPayload = ({ view }) => {
+  // Extract values from view submission payload
+  const {
+    block_title: { input_title: { value: title } },
+    block_priority: { input_priority: { selected_option: { value: priority } } },
+    block_description: { input_description: { value: description } }
+  } = view.state.values
+
+  return { title, priority, description }
+}
+
+// Validate inputs and return error object
+const validateInputs = ({ title, priority, description }) => {
+  const errors = {}
+  if (description.length < 10) {
+    errors.block_description = 'Description must be at least 10 characters'
+  }
+  return errors
+}
+
+// == SLACK BOLT LISTENERS ==
 // Listen for 'File a bug' global shortcut
 app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client }) => {
   // Acknowledge shortcut request
@@ -40,7 +63,7 @@ app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: modalBlocks.newBug()
+    view: modalBlocks.newBug({})
   })
 })
 
@@ -58,19 +81,10 @@ app.shortcut('fileABugMessageShortcut', async ({ ack, shortcut, client }) => {
 
 // Listen for form/modal submission
 app.view('create_bug', async ({ ack, body, view, client, logger }) => {
-  // Extract user-submitted values from view submission object
-  const {
-    block_title: { input_title: { value: title } },
-    block_priority: { input_priority: { selected_option: { value: priority } } },
-    block_description: { input_description: { value: description } }
-  } = view.state.values
-  logger.debug('User submitted values: ', { title, priority, description })
-
-  // Validate inputs
-  const errors = {}
-  if (description.length < 10) {
-    errors.block_description = 'Description must be at least 10 characters'
-  }
+  // Extract values from view submission payload and validate them/generate errors
+  const { title, priority, description } = await extractInputsFromViewSubmissionPayload({ view })
+  const errors = validateInputs({ title, priority, description })
+  logger.debug({ title, priority, description, errors })
 
   // If there are errors, respond to Slack with errors; otherwise, respond with a confirmation
   if (Object.keys(errors).length > 0) {
@@ -97,6 +111,7 @@ app.view('create_bug', async ({ ack, body, view, client, logger }) => {
     })
 
     // Create object to be inserted into Airtable table
+    // TODO - refactor to not use literal strings for Airtable field names
     const newRecordFields = {
       'Short description': title,
       'Long description': description,
@@ -146,7 +161,7 @@ app.action('file_a_bug', async ({ ack, body, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: body.trigger_id,
-    view: modalBlocks.newBug()
+    view: modalBlocks.newBug({})
   })
 })
 
