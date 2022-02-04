@@ -83,10 +83,10 @@ const bugFormFields = function (title = '', priority = null, description = '') {
   ]
 }
 
-const fileANewBug = function (title = '', priority = null, description = '') {
+const newBug = function (title = '', priority = null, description = '') {
   return {
     type: 'modal',
-    callback_id: 'fileABugModal',
+    callback_id: 'create_bug',
     submit: {
       type: 'plain_text',
       text: 'Submit :rocket:',
@@ -118,5 +118,5 @@ const fileANewBug = function (title = '', priority = null, description = '') {
 }
 
 module.exports = {
-  fileANewBug
+  newBug
 }

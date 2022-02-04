@@ -40,7 +40,7 @@ app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: modalBlocks.fileANewBug()
+    view: modalBlocks.newBug()
   })
 })
 
@@ -52,12 +52,12 @@ app.shortcut('fileABugMessageShortcut', async ({ ack, shortcut, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: modalBlocks.fileANewBug(shortcut.message.text)
+    view: modalBlocks.newBug(shortcut.message.text)
   })
 })
 
 // Listen for form/modal submission
-app.view('fileABugModal', async ({ ack, body, view, client, logger }) => {
+app.view('create_bug', async ({ ack, body, view, client, logger }) => {
   // Extract user-submitted values from view submission object
   const {
     block_title: { input_title: { value: title } },
@@ -146,7 +146,7 @@ app.action('file_a_bug', async ({ ack, body, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: body.trigger_id,
-    view: modalBlocks.fileANewBug()
+    view: modalBlocks.newBug()
   })
 })
 
