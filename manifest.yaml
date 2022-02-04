@@ -1,8 +1,8 @@
 display_information:
-  name: Example Bug Tracker (dev local)
+  name: Airtable Bug Tracker (dev local)
 features:
   bot_user:
-    display_name: File a bug (dev local)
+    display_name: Airtable Bug Tracker (dev local)
     always_online: true
   app_home:
     home_tab_enabled: true
