@@ -8,9 +8,9 @@ const { App } = require('@slack/bolt')
 const Airtable = require('airtable')
 
 // Load helper functions
-const { fileABugModalPayload } = require('./views/modals')
+const modalBlocks = require('./views/modals')
 const messageBlocks = require('./views/messages')
-const { blocksForAppHome } = require('./views/app_home')
+const appHomeBlocks = require('./views/app_home')
 
 /*
 This sample slack application uses SocketMode
@@ -40,7 +40,7 @@ app.shortcut('fileABugGlobalShortcut', async ({ shortcut, ack, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: fileABugModalPayload()
+    view: modalBlocks.fileABug()
   })
 })
 
@@ -52,7 +52,7 @@ app.shortcut('fileABugMessageShortcut', async ({ ack, shortcut, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: fileABugModalPayload(shortcut.message.text)
+    view: modalBlocks.fileABug(shortcut.message.text)
   })
 })
 
@@ -133,7 +133,7 @@ app.event('app_home_opened', async ({ event, client }) => {
     user_id: event.user,
     view: {
       type: 'home',
-      blocks: blocksForAppHome(Config.AIRTABLE_BASE_ID, Config.AIRTABLE_TABLE_ID)
+      blocks: appHomeBlocks(Config.AIRTABLE_BASE_ID, Config.AIRTABLE_TABLE_ID)
     }
   })
 })
@@ -146,7 +146,7 @@ app.action('file_a_bug', async ({ ack, body, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: body.trigger_id,
-    view: fileABugModalPayload()
+    view: modalBlocks.fileABug()
   })
 });
 

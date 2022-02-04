@@ -1,4 +1,4 @@
-const blocksForAppHome = function (airtableBaseId, airtableTableId) {
+const simpleAppHome = function (airtableBaseId, airtableTableId) {
   return [
     {
       type: 'header',
@@ -56,6 +56,4 @@ const blocksForAppHome = function (airtableBaseId, airtableTableId) {
   ]
 }
 
-module.exports = {
-  blocksForAppHome
-}
+module.exports = simpleAppHome

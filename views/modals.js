@@ -1,4 +1,4 @@
-const fileABugModalPayload = function (description = '') {
+const fileABug = function (description = '') {
   return {
     type: 'modal',
     callback_id: 'fileABugModal',
@@ -101,5 +101,5 @@ const fileABugModalPayload = function (description = '') {
 }
 
 module.exports = {
-  fileABugModalPayload
+  fileABug
 }
