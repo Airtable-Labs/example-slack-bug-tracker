@@ -27,7 +27,8 @@ Fields.set('long_description', {
     } else { // return true if there are no errors
       return true
     }
-  }
+  },
+  messageShortcutPrefill: true // only one field should have this set to true
 })
 
 module.exports = {

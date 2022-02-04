@@ -9,15 +9,13 @@ const { App } = require('@slack/bolt')
 const Airtable = require('airtable')
 
 // Load helper functions
+const helpers = require('./helpers')
 const modalBlocks = require('./views/modals')
 const messageBlocks = require('./views/messages')
 const appHomeBlocks = require('./views/app_home')
 
-/*
-This sample slack application uses SocketMode
-For the companion getting started setup guide,
-see: https://slack.dev/bolt-js/tutorial/getting-started
-*/
+// Call some helper functions in preparation for runtime
+const fieldToPrefillForMessageShortcut = helpers.determineFieldNameForMessageShortcutPrefill(Fields)
 
 // Initializes your app with your bot token and app token
 const app = new App({
@@ -31,54 +29,6 @@ const app = new App({
 const airtableClient = new Airtable({ apiKey: EnvVars.AIRTABLE_API_KEY })
 const airtableBase = airtableClient.base(EnvVars.AIRTABLE_BASE_ID)
 const airtableTable = airtableBase(EnvVars.AIRTABLE_TABLE_ID)
-
-// == HELPER FUNCTIONS ==
-// Extract values from view submission payload
-const extractInputsFromViewSubmissionPayload = ({ view }) => {
-  const fieldsWithValues = {}
-
-  // Loop through all values we received from Slack and extract the value depending on field type
-  Object.keys(view.state.values).forEach((fieldName) => {
-    // fieldName represents the Slack view block_id and action_id (we use the Fields' object key for both)
-    const inputReceived = view.state.values[fieldName][fieldName]
-
-    // Make a copy of the field config
-    const fieldConfig = Object.assign({}, Fields.get(fieldName))
-
-    // TODO support additional Slack input element types (https://api.slack.com/reference/block-kit/blocks#input)
-    switch (inputReceived.type) {
-      case 'plain_text_input':
-        fieldConfig.value = inputReceived.value
-        break
-      case 'static_select':
-        fieldConfig.value = inputReceived.selected_option.value
-        break
-    }
-
-    // Add the field config to the fieldsWithValues object
-    fieldsWithValues[fieldName] = fieldConfig
-  })
-
-  return fieldsWithValues
-}
-
-// Validate inputs and return error object
-const validateInputs = (fieldsWithValues) => {
-  const errors = {}
-
-  // Loop through all fields validate the value (if a validation function is defined)
-  for (const fieldName of Object.keys(fieldsWithValues)) {
-    const fieldConfigWithValue = fieldsWithValues[fieldName]
-    if (fieldConfigWithValue.validationFn) {
-      const validationError = fieldConfigWithValue.validationFn(fieldConfigWithValue.value)
-      if (validationError !== true) { // true means no error
-        errors[fieldName] = validationError
-      }
-    }
-  }
-
-  return errors
-}
 
 // == SLACK BOLT LISTENERS ==
 // Listen for 'File a bug' global shortcut
@@ -100,8 +50,7 @@ app.shortcut('create_record_from_message_shortcut', async ({ ack, shortcut, clie
 
   // Create a copy of the Fields map and prefill it with the value from the message shortcut
   const copyOfFieldsWithPrefill = new Map(Fields)
-  // TODO abstract out 'long_description' fieldName
-  copyOfFieldsWithPrefill.set('long_description', { value: shortcut.message.text, ...Fields.get('long_description') })
+  copyOfFieldsWithPrefill.set(fieldToPrefillForMessageShortcut, { value: shortcut.message.text, ...Fields.get(fieldToPrefillForMessageShortcut) })
 
   // Open modal using WebClient passed in from middleware.
   //   Uses modal defintion from views/modals.js
@@ -114,8 +63,8 @@ app.shortcut('create_record_from_message_shortcut', async ({ ack, shortcut, clie
 // Listen for form/modal submission
 app.view('create_record_submission', async ({ ack, body, view, client, logger }) => {
   // Extract values from view submission payload and validate them/generate errors
-  const fieldsWithValues = await extractInputsFromViewSubmissionPayload({ view })
-  const errors = validateInputs(fieldsWithValues)
+  const fieldsWithValues = await helpers.extractInputsFromViewSubmissionPayload({ view }, Fields)
+  const errors = helpers.validateInputs(fieldsWithValues)
   logger.debug({ fieldsWithValues, errors })
 
   // If there are errors, respond to Slack with errors; otherwise, respond with a confirmation
@@ -135,14 +84,18 @@ app.view('create_record_submission', async ({ ack, body, view, client, logger })
     })
 
     // Create object to be inserted into Airtable table
+    // Determine payload for Airtable record update
+    // Start with fields that are not editable by Slack users
     // TODO - refactor to not use literal strings for Airtable field names
     const newRecordFields = {
-      'Short description': fieldsWithValues.short_description.value,
-      'Long description': fieldsWithValues.long_description.value,
-      Priority: fieldsWithValues.priority.value,
       'Submitter Slack UID': body.user.id,
       'Submitter Slack Name': body.user.name
     }
+    // Add fields from view submission payload
+    Object.keys(fieldsWithValues).forEach((fieldName) => {
+      const fieldWithValue = fieldsWithValues[fieldName]
+      newRecordFields[fieldWithValue.airtableFieldName] = fieldWithValue.value
+    })
 
     // Depending on success/failure from Airtable API, update DM to submitter
     let updateToSubmitter = ''
@@ -260,8 +213,8 @@ app.view('update_record_submission', async ({ ack, body, view, client, logger })
   const { recordId, channelId, threadTs } = JSON.parse(privateMetadataAsString)
 
   // Extract values from view submission payload and validate them/generate errors
-  const fieldsWithValues = await extractInputsFromViewSubmissionPayload({ view })
-  const errors = validateInputs(fieldsWithValues)
+  const fieldsWithValues = await helpers.extractInputsFromViewSubmissionPayload({ view }, Fields)
+  const errors = helpers.validateInputs(fieldsWithValues)
   logger.debug({ fieldsWithValues, errors })
 
   // If there are errors, respond to Slack with errors; otherwise, respond with a confirmation
@@ -281,19 +234,18 @@ app.view('update_record_submission', async ({ ack, body, view, client, logger })
       text: `Your request to update this record (${recordId}) has been received and is being processed.`
     })
 
-    // Update Airtable record
-    // TODO - refactor to not use literal strings for Airtable field names
-    const fieldsToUpdate = {
-      'Short description': fieldsWithValues.short_description.value,
-      'Long description': fieldsWithValues.long_description.value,
-      Priority: fieldsWithValues.priority.value
-    }
+    // Determine payload for Airtable record update
+    const fieldsToUpdate = {}
+    Object.keys(fieldsWithValues).forEach((fieldName) => {
+      const fieldWithValue = fieldsWithValues[fieldName]
+      fieldsToUpdate[fieldWithValue.airtableFieldName] = fieldWithValue.value
+    })
 
-    // Depending on success/failure from Airtable API, update DM to submitter
+    // Depending on success/failure from Airtable API, send DM to submitter (to existing thread)
     let updateToSubmitter = ''
     try {
-      await airtableTable.update(recordId, fieldsToUpdate)
-      updateToSubmitter = messageBlocks.simpleMessage(':white_check_mark: Your record has been updated.')
+      const updatedRecord = await airtableTable.update(recordId, fieldsToUpdate)
+      updateToSubmitter = messageBlocks.simpleMessage(`:white_check_mark: Your <https://airtable.com/${EnvVars.AIRTABLE_BASE_ID}/${EnvVars.AIRTABLE_TABLE_ID}/${recordId}|record> has been updated. The primary field value is now *${updatedRecord.get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)}*`)
     } catch (error) {
       updateToSubmitter = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while updating your <https://airtable.com/${EnvVars.AIRTABLE_BASE_ID}/${EnvVars.AIRTABLE_TABLE_ID}/${recordId}|record> details in Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
     }
