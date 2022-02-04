@@ -17,7 +17,7 @@ const nonEmptyStringStartsWith = function (x) {
   })()
 }
 
-// Defune a custom validator that requires the value to be a non-empty string
+// Define a custom validator that requires the value to be a non-empty string
 const nonEmptyString = envalid.makeValidator((v) => {
   if (v === '') {
     throw new Error('Value must not be empty')
@@ -39,6 +39,7 @@ const EnvVars = envalid.cleanEnv(process.env, {
   LOG_LEVEL: envalid.str({ default: 'info', choices: ['debug', 'info', 'warn', 'error'] })
 })
 
+// If we got this far, environment variables have been validated
 console.log('✅ Environment variables validated & loaded')
 
 module.exports = {

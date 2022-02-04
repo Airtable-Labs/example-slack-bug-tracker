@@ -15,10 +15,7 @@
     "dotenv": "^14.3.2",
     "envalid": "^7.2.2"
   },
-  "author": {
-    "name": "Mark Silverberg",
-    "email": "mark@marksilver.net"
-  },
+  "author": "Airtable Labs",
   "contributors": [
     {
       "name": "Slack",
