@@ -156,8 +156,7 @@ app.action('url_button', async ({ ack }) => {
   await ack()
 })
 
-// Listen for users clicking a button that opens a URL
-//   Without this, Slack will show a /!\ warning icon next to buttons
+// Listen for users clicking the 'Delete' button from their DMs
 app.action('delete_record', async ({ ack, action, respond, body, logger }) => {
   await ack()
   const recordId = action.value
