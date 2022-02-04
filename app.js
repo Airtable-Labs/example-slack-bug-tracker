@@ -63,7 +63,7 @@ app.shortcut('create_record_from_global_shortcut', async ({ shortcut, ack, clien
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: modalBlocks.newRecord({})
+    view: modalBlocks.createRecordForm({})
   })
 })
 
@@ -75,7 +75,7 @@ app.shortcut('create_record_from_message_shortcut', async ({ ack, shortcut, clie
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: shortcut.trigger_id,
-    view: modalBlocks.newRecord({ description: shortcut.message.text })
+    view: modalBlocks.createRecordForm({ description: shortcut.message.text })
   })
 })
 
@@ -161,7 +161,7 @@ app.action('create_record', async ({ ack, body, client }) => {
   //   Uses modal defintion from views/modals.js
   await client.views.open({
     trigger_id: body.trigger_id,
-    view: modalBlocks.newRecord({})
+    view: modalBlocks.createRecordForm({})
   })
 })
 
@@ -208,7 +208,7 @@ app.action('edit_record', async ({ ack, action, client, body }) => {
   // Open modal and prefill values
   await client.views.open({
     trigger_id: body.trigger_id,
-    view: modalBlocks.updateRecord({
+    view: modalBlocks.updateRecordForm({
       privateMetadata: JSON.stringify({ recordId, channelId: body.channel.id, threadTs: body.message.thread_ts }),
       // TODO - refactor to not use literal strings for Airtable field names
       title: recordBeforeEditing.get('Short description'),

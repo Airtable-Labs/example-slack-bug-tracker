@@ -83,7 +83,7 @@ const recordFormFields = function ({ title, priority, description }) {
   ]
 }
 
-const newRecord = function ({ description }) {
+const createRecordForm = function ({ description }) {
   return {
     type: 'modal',
     callback_id: 'create_record_submission',
@@ -117,7 +117,7 @@ const newRecord = function ({ description }) {
   }
 }
 
-const updateRecord = function ({ title, priority, description, privateMetadata }) {
+const updateRecordForm = function ({ title, priority, description, privateMetadata }) {
   return {
     type: 'modal',
     callback_id: 'update_record_submission',
@@ -153,6 +153,6 @@ const updateRecord = function ({ title, priority, description, privateMetadata }
 }
 
 module.exports = {
-  newRecord,
-  updateRecord
+  createRecordForm,
+  updateRecordForm
 }
