@@ -12,7 +12,8 @@
   "dependencies": {
     "@slack/bolt": "^3.9.0",
     "airtable": "^0.11.1",
-    "dotenv": "^14.3.2"
+    "dotenv": "^14.3.2",
+    "envalid": "^7.2.2"
   },
   "author": {
     "name": "Mark Silverberg",

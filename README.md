@@ -95,6 +95,7 @@ From your terminal...
 
 2. You should see output that looks like the following:
     ```zsh
+    ✅ Environment variables validated & loaded
     [INFO]  web-api:WebClient:0 ✅  Connected to Airtable
     [INFO]  web-api:WebClient:0 ✅  Slack Bolt app is running!
     ```
