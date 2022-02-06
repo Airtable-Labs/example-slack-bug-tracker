@@ -31,7 +31,7 @@ const airtableBase = airtableClient.base(EnvVars.AIRTABLE_BASE_ID)
 const airtableTable = airtableBase(EnvVars.AIRTABLE_TABLE_ID)
 
 // == SLACK BOLT LISTENERS ==
-// Listen for 'File a bug' global shortcut
+// Listen for global shortcut
 app.shortcut('create_record_from_global_shortcut', async ({ shortcut, ack, client }) => {
   // Acknowledge shortcut request
   await ack()
@@ -44,7 +44,7 @@ app.shortcut('create_record_from_global_shortcut', async ({ shortcut, ack, clien
   })
 })
 
-// Listen for 'File a bug' message shortcut
+// Listen for message shortcut
 app.shortcut('create_record_from_message_shortcut', async ({ ack, shortcut, client }) => {
   await ack()
 
@@ -130,7 +130,7 @@ app.event('app_home_opened', async ({ event, client }) => {
   })
 })
 
-// Listen for users clicking the 'File a bug' button from App Home
+// Listen for users clicking the new record button from App Home
 app.action('create_record', async ({ ack, body, client }) => {
   await ack()
 
