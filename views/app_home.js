@@ -1,4 +1,4 @@
-const blocksForAppHome = function (airtableBaseId, airtableTableId) {
+const simpleAppHome = function (airtableBaseId, airtableTableId) {
   return [
     {
       type: 'header',
@@ -17,7 +17,7 @@ const blocksForAppHome = function (airtableBaseId, airtableTableId) {
             text: ':new: File a new bug',
             emoji: true
           },
-          action_id: 'file_a_bug',
+          action_id: 'create_record',
           style: 'primary'
         },
         {
@@ -27,6 +27,7 @@ const blocksForAppHome = function (airtableBaseId, airtableTableId) {
             text: ':link: Visit Airtable base',
             emoji: true
           },
+          action_id: 'url_button',
           url: `https://airtable.com/${airtableBaseId}/${airtableTableId}`
         }
       ]
@@ -56,6 +57,4 @@ const blocksForAppHome = function (airtableBaseId, airtableTableId) {
   ]
 }
 
-module.exports = {
-  blocksForAppHome
-}
+module.exports = simpleAppHome

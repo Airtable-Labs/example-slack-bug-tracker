@@ -24,7 +24,7 @@ The software made available from this repository is not supported by Formagrid I
 
 ### 0. Setup or identify your "Bugs" table in Airtable
 
-The example code in this project expects the Airtable table you specify (in the next step) to have the following fields: `Short description` (single line text), `Long description` (long text), `Priority` (single select), `Submitter Slack UID` (single line text), and `Submitter Slack Name` (single line text).
+The example code in this project expects the Airtable table you specify (in the next step) to have the following fields: `Short description` (single line text), `Long description` (long text), `Priority` (single select), `Submitter Slack UID` (single line text), `Submitter Slack Name` (single line text), `Updater Slack UID` (single line text), and `Updater Slack Name` (single line text).
 
 You can copy [this sample table](https://airtable.com/shrUnY5ULVeIcOfFr) into your own base if you'd like. Pointers on how which code to modify to adapt this example are below. It's recommended you use this exact schema for your initial test of the example code.
 
@@ -69,6 +69,8 @@ AIRTABLE_API_KEY=key...
 AIRTABLE_BASE_ID=app...
 # Table ID from https://support.airtable.com/hc/en-us/articles/4405741487383
 AIRTABLE_TABLE_ID=tbl...
+# Primary field name for the table
+AIRTABLE_PRIMARY_FIELD_NAME=Name
 
 LOG_LEVEL=info # error, warn, info, and debug are valid options
 ```
@@ -106,7 +108,7 @@ Your app should be ready to try from Slack ðŸš€. Check out the Global Shortcut â
 
 ### 6. Iterate and develop
 - You can run `npm run watch` (instead of `npm run start`) to have `nodemon` watch code files for changes and automatically restart the server for a quicker iterating.
-- To change the fields in the form, update `views/modals.js` and `views/message.js` to include valid Block Kit JSON (as Node objects) and update the `app.shortcut` listeners in `app.js` to expect and use the new Slack BlockKit `block_ids` and `action_ids`
+- To change the fields in the form, update `config/fields.js`. To update user-facing messages, check out `app.js` and `views/` too.
 
 ## Contributing
 

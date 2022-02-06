@@ -1,8 +1,8 @@
 display_information:
-  name: Example Bug Tracker (dev local)
+  name: Airtable Bug Tracker (dev local)
 features:
   bot_user:
-    display_name: File a bug (dev local)
+    display_name: Airtable Bug Tracker (dev local)
     always_online: true
   app_home:
     home_tab_enabled: true
@@ -11,18 +11,17 @@ features:
   shortcuts:
     - name: File a bug (dev local)
       type: global
-      callback_id: fileABugGlobalShortcut
+      callback_id: create_record_from_global_shortcut
       description: Submit bug to our Airtable base for triage
     - name: File a bug (dev local)
       type: message
-      callback_id: fileABugMessageShortcut
+      callback_id: create_record_from_message_shortcut
       description: Submit bug to our Airtable base for triage
 oauth_config:
   scopes:
     bot:
       - commands
       - chat:write
-      - reactions:write
 settings:
   event_subscriptions:
     bot_events:
