@@ -113,7 +113,33 @@ const updateRecordForm = function (fieldConfigsWithValuesMaybe, privateMetadata)
   }
 }
 
+const simpleMessage = function (message) {
+  return {
+    type: 'modal',
+    title: {
+      type: 'plain_text',
+      text: 'Message',
+      emoji: true
+    },
+    close: {
+      type: 'plain_text',
+      text: 'Close',
+      emoji: true
+    },
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: message
+        }
+      }
+    ]
+  }
+}
+
 module.exports = {
   createRecordForm,
-  updateRecordForm
+  updateRecordForm,
+  simpleMessage
 }

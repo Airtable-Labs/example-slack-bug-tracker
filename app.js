@@ -153,8 +153,6 @@ app.action('delete_record', async ({ ack, action, client, body, logger }) => {
   await ack()
   const recordId = action.value
 
-  console.log({ body })
-
   // Attempt to delete record from Airtable
   try {
     const recordBeforeDeletion = await airtableTable.find(recordId)
@@ -162,7 +160,7 @@ app.action('delete_record', async ({ ack, action, client, body, logger }) => {
 
     // If successful, update the parent message to user by removing action buttons
     const updatedBlocks = body.message.blocks.slice(0, 2)
-    updatedBlocks.push(...messageBlocks.simpleMessage(`:ghost: Record *${recordBeforeDeletion.get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)}** (${recordId}) was successfully deleted. You can recover deleted records from your <https://support.airtable.com/hc/en-us/articles/115014104628-Base-trash|base trash> for a limited amount of time.`))
+    updatedBlocks.push(...messageBlocks.simpleMessage(`:ghost: Record *${recordBeforeDeletion.get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)}* (${recordId}) was successfully deleted. You can recover deleted records from your <https://support.airtable.com/hc/en-us/articles/115014104628-Base-trash|base trash> for a limited amount of time.`))
     await client.chat.update({
       blocks: updatedBlocks,
       channel: body.channel.id,
@@ -179,32 +177,41 @@ app.action('delete_record', async ({ ack, action, client, body, logger }) => {
 })
 
 // Listen for users clicking the 'Edit' button from their DMs
-app.action('edit_record', async ({ ack, action, client, body }) => {
+app.action('edit_record', async ({ ack, action, client, body, logger }) => {
   await ack()
 
   // Retrieve latest record values from Airtable
   const recordId = action.value
-  const recordBeforeEditing = await airtableTable.find(recordId)
-  const privateMetadataAsString = JSON.stringify({ recordId, channelId: body.channel.id, threadTs: body.message.ts })
 
-  // Create a copy of the Fields map and prefill it with the value from the message shortcut
-  const copyOfFieldsWithPrefill = new Map(Fields)
+  let view
+  try {
+    // Try to retrieve the record from Airtable and generate blocks
+    const recordBeforeEditing = await airtableTable.find(recordId)
+    const privateMetadataAsString = JSON.stringify({ recordId, channelId: body.channel.id, threadTs: body.message.ts })
 
-  Fields.forEach((fieldConfig, fieldName) => {
-    const currentAirtableValue = recordBeforeEditing.get(fieldConfig.airtableFieldName)
-    // If there is a value for the current field in the latest version of the record, prefill it
-    if (currentAirtableValue) {
-      copyOfFieldsWithPrefill.set(fieldName, {
-        ...fieldConfig,
-        value: currentAirtableValue
-      })
-    }
-  })
+    // Create a copy of the Fields map and prefill it with the value from the message shortcut
+    const copyOfFieldsWithPrefill = new Map(Fields)
 
-  // Open modal and prefill values
+    Fields.forEach((fieldConfig, fieldName) => {
+      const currentAirtableValue = recordBeforeEditing.get(fieldConfig.airtableFieldName)
+      // If there is a value for the current field in the latest version of the record, prefill it
+      if (currentAirtableValue) {
+        copyOfFieldsWithPrefill.set(fieldName, {
+          ...fieldConfig,
+          value: currentAirtableValue
+        })
+      }
+    })
+    view = modalBlocks.updateRecordForm(copyOfFieldsWithPrefill, privateMetadataAsString)
+  } catch (err) {
+    logger.error({ err })
+    view = modalBlocks.simpleMessage(':bangbang: Sorry, but an error occured and this record cannot be edited at this time. Most likely, the record has been deleted.')
+  }
+
+  // Open modal
   await client.views.open({
     trigger_id: body.trigger_id,
-    view: modalBlocks.updateRecordForm(copyOfFieldsWithPrefill, privateMetadataAsString)
+    view
   })
 })
 
