@@ -31,6 +31,7 @@ const extractInputsFromViewSubmissionPayload = ({ view }, fieldConfig) => {
 
   return fieldsWithValues
 }
+
 // Extract value from view submission payload
 // TODO support additional Slack input element types (https://api.slack.com/reference/block-kit/blocks#input)
 const slackInputViewStateToValue = (inputViewState) => {

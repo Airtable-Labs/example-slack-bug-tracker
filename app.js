@@ -77,16 +77,15 @@ app.view('create_record_submission', async ({ ack, body, view, client, logger })
     // If there are no errors, close the modal and DM the user a confirmation
     await ack()
 
-    const dmToSubmitter = await client.chat.postMessage({
+    const initialDmToSubmitterBlocks = messageBlocks.initialMessageToSubmitter(fieldsWithValues, body.user.id)
+    const initialDmToSubmitter = await client.chat.postMessage({
       channel: body.user.id,
-      text: 'Thanks for your bug report! We will triage it ASAP.',
-      blocks: messageBlocks.initialMessageToSubmitter(fieldsWithValues)
+      blocks: initialDmToSubmitterBlocks
     })
 
     // Create object to be inserted into Airtable table
     // Determine payload for Airtable record update
     // Start with fields that are not editable by Slack users
-    // TODO - refactor to not use literal strings for Airtable field names
     const newRecordFields = {
       [SystemFields.get('submitter_slack_uid').airtableFieldName]: body.user.id,
       [SystemFields.get('submitter_slack_name').airtableFieldName]: body.user.name
@@ -98,23 +97,23 @@ app.view('create_record_submission', async ({ ack, body, view, client, logger })
     })
 
     // Depending on success/failure from Airtable API, update DM to submitter
-    let updateToSubmitter = ''
+    let additionalBlocksForDm = []
     try {
       const newRecord = await airtableTable.create([{ fields: newRecordFields }])
       const newRecordId = newRecord[0].getId()
       const newRecordPrimaryFieldValue = newRecord[0].get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)
-      updateToSubmitter = messageBlocks.successfullySavedToAirtable(EnvVars.AIRTABLE_BASE_ID, EnvVars.AIRTABLE_TABLE_ID, newRecordId, newRecordPrimaryFieldValue)
+      additionalBlocksForDm = messageBlocks.successfullySavedToAirtable(EnvVars.AIRTABLE_BASE_ID, EnvVars.AIRTABLE_TABLE_ID, newRecordId, newRecordPrimaryFieldValue)
     } catch (error) {
-      updateToSubmitter = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while sending your record details to Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
+      additionalBlocksForDm = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while sending your record details to Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
     }
 
-    // Thread update to DM thread
-    await client.chat.postMessage({
-      channel: dmToSubmitter.channel,
-      thread_ts: dmToSubmitter.ts,
-      blocks: updateToSubmitter,
-      unfurl_links: false,
-      reply_broadcast: true // send threaded reply to channel so the user sees it
+    // Update initial DM to submitter
+    initialDmToSubmitterBlocks.pop() // remove last block
+    const updatedDmToSubmitterBlocks = initialDmToSubmitterBlocks.concat(additionalBlocksForDm)
+    await client.chat.update({
+      channel: initialDmToSubmitter.channel,
+      ts: initialDmToSubmitter.ts,
+      blocks: updatedDmToSubmitterBlocks
     })
   }
 })
@@ -150,29 +149,33 @@ app.action('url_button', async ({ ack }) => {
 })
 
 // Listen for users clicking the 'Delete' button from their DMs
-app.action('delete_record', async ({ ack, action, respond, body, logger }) => {
+app.action('delete_record', async ({ ack, action, client, body, logger }) => {
   await ack()
   const recordId = action.value
 
+  console.log({ body })
+
   // Attempt to delete record from Airtable
-  let blocks = []
   try {
     const recordBeforeDeletion = await airtableTable.find(recordId)
     await recordBeforeDeletion.destroy()
-    logger.debug({ recordBeforeDeletion })
-    blocks = messageBlocks.simpleMessage(`Record \`${recordBeforeDeletion.get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)}\` (${recordId}) was successfully deleted. \n\nYou can recover deleted records from your <https://support.airtable.com/hc/en-us/articles/115014104628-Base-trash|base trash> for a limited amount of time.`)
-  } catch (error) {
-    blocks = messageBlocks.simpleMessage(`<@${body.user.id}> There was an error deleting this record (it may have been already deleted by someone else): \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
-  }
 
-  // Respond by deleting the original message and adding a new message to the thread
-  await respond({
-    blocks,
-    replace_original: false,
-    delete_original: true,
-    response_type: 'in_channel',
-    thread_ts: body.message.thread_ts
-  })
+    // If successful, update the parent message to user by removing action buttons
+    const updatedBlocks = body.message.blocks.slice(0, 2)
+    updatedBlocks.push(...messageBlocks.simpleMessage(`:ghost: Record *${recordBeforeDeletion.get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)}** (${recordId}) was successfully deleted. You can recover deleted records from your <https://support.airtable.com/hc/en-us/articles/115014104628-Base-trash|base trash> for a limited amount of time.`))
+    await client.chat.update({
+      blocks: updatedBlocks,
+      channel: body.channel.id,
+      ts: body.message.ts
+    })
+  } catch (error) {
+    // If not successful, thread a message to the user with the error
+    await client.chat.postMessage({
+      blocks: messageBlocks.simpleMessage(`<@${body.user.id}> There was an error deleting this record (it may have been already deleted by someone else): \`\`\`${JSON.stringify(error, null, 2)} \`\`\``),
+      channel: body.channel.id,
+      thread_ts: body.message.ts
+    })
+  }
 })
 
 // Listen for users clicking the 'Edit' button from their DMs
@@ -182,8 +185,7 @@ app.action('edit_record', async ({ ack, action, client, body }) => {
   // Retrieve latest record values from Airtable
   const recordId = action.value
   const recordBeforeEditing = await airtableTable.find(recordId)
-
-  const privateMetadataAsString = JSON.stringify({ recordId, channelId: body.channel.id, threadTs: body.message.thread_ts })
+  const privateMetadataAsString = JSON.stringify({ recordId, channelId: body.channel.id, threadTs: body.message.ts })
 
   // Create a copy of the Fields map and prefill it with the value from the message shortcut
   const copyOfFieldsWithPrefill = new Map(Fields)
@@ -227,11 +229,10 @@ app.view('update_record_submission', async ({ ack, body, view, client, logger })
     // If there are no errors, close the modal and update the thread
     await ack()
 
-    // TODO add information about the updated fields values
     await client.chat.postMessage({
       channel: channelId,
       thread_ts: threadTs,
-      text: `Your request to update this record (${recordId}) has been received and is being processed.`
+      blocks: messageBlocks.recordUpdateConfirmation(fieldsWithValues)
     })
 
     // Determine payload for Airtable record update
@@ -258,8 +259,7 @@ app.view('update_record_submission', async ({ ack, body, view, client, logger })
       channel: channelId,
       thread_ts: threadTs,
       blocks: updateToSubmitter,
-      unfurl_links: false,
-      reply_broadcast: true // send threaded reply to channel
+      unfurl_links: false
     })
   }
 })

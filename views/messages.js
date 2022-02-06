@@ -1,37 +1,33 @@
-const initialMessageToSubmitter = function (fieldsWithValues) {
-  const fields = Object.keys(fieldsWithValues).map(fieldName => {
-    const fieldWithValue = fieldsWithValues[fieldName]
-    return slackSectionFieldGenerator(fieldWithValue.slackInputLabel, fieldWithValue.value)
-  })
-
+const initialMessageToSubmitter = function (fieldsWithValues, slackUserId) {
   return [
     {
       type: 'section',
       text: {
-        type: 'plain_text',
-        text: 'Thank you for your report! The team will triage it ASAP.'
+        type: 'mrkdwn',
+        text: `<@${slackUserId}> Thank you for your report! The team will triage it ASAP.`
       }
     },
     {
       type: 'section',
-      fields
+      fields: fieldsWithValuesToSlackSectionFields(fieldsWithValues)
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '_This message will update once your submission is saved to Airtable._'
+      }
     }
   ]
 }
 
-const slackSectionFieldGenerator = (key, value) => {
-  return {
-    type: 'mrkdwn',
-    text: `*${key}:*\n${value}`
-  }
-}
 const successfullySavedToAirtable = function (baseId, tableId, recordId, recordPrimaryFieldValue) {
   return [
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `:white_check_mark: Your bug report has been saved to Airtable. The new record's primary field value is *${recordPrimaryFieldValue}* and the record ID is ${recordId}.`
+        text: `:white_check_mark: Your record has been saved to Airtable. The new record's primary field value is *${recordPrimaryFieldValue}* and the record ID is ${recordId}.`
       }
     },
     {
@@ -93,6 +89,22 @@ const successfullySavedToAirtable = function (baseId, tableId, recordId, recordP
   ]
 }
 
+const recordUpdateConfirmation = function (fieldsWithValues) {
+  return [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'Your request to update the record has been received.'
+      }
+    },
+    {
+      type: 'section',
+      fields: fieldsWithValuesToSlackSectionFields(fieldsWithValues)
+    }
+  ]
+}
+
 const simpleMessage = function (message) {
   return [
     {
@@ -105,8 +117,24 @@ const simpleMessage = function (message) {
   ]
 }
 
+// Helper functions related to block kit generation
+const fieldsWithValuesToSlackSectionFields = function (fieldsWithValues) {
+  return Object.keys(fieldsWithValues).map(fieldName => {
+    const fieldWithValue = fieldsWithValues[fieldName]
+    return slackSectionFieldGenerator(fieldWithValue.slackInputLabel, fieldWithValue.value)
+  })
+}
+
+const slackSectionFieldGenerator = (key, value) => {
+  return {
+    type: 'mrkdwn',
+    text: `*${key}:*\n${value}`
+  }
+}
+
 module.exports = {
   initialMessageToSubmitter,
   successfullySavedToAirtable,
+  recordUpdateConfirmation,
   simpleMessage
 }
