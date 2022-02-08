@@ -8,6 +8,9 @@ const { App } = require('@slack/bolt')
 // Load Airtable.js, a wrapper for the Airtable API
 const Airtable = require('airtable')
 
+// Load util stdlib for full object logging
+const util = require('util')
+
 // Load helper functions
 const helpers = require('./helpers')
 const modalBlocks = require('./views/modals')
@@ -269,6 +272,11 @@ app.view('update_record_submission', async ({ ack, body, view, client, logger })
       unfurl_links: false
     })
   }
+})
+
+app.error((error) => {
+  console.error('An error was caught by Bolt app.error:')
+  console.log(util.inspect(error, false, null, true))
 })
 
 // == START SLACK APP SERVER ==
