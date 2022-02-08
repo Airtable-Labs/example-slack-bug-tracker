@@ -1,60 +1,38 @@
-const simpleAppHome = function (airtableBaseId, airtableTableId) {
-  return [
-    {
-      type: 'header',
-      text: {
-        type: 'plain_text',
-        text: "Here's what you can do with this app:"
-      }
-    },
-    {
-      type: 'actions',
-      elements: [
-        {
-          type: 'button',
-          text: {
+const { HomeTab, Blocks, Elements } = require('slack-block-builder')
+
+const appHome = function (airtableBaseId, airtableTableId) {
+  return HomeTab()
+    .blocks(
+      Blocks.Header({ text: 'Welcome to the Bug Tracker' }),
+      Blocks.Section({
+        text: 'This is an example Slack app that allows you to submit records to Airtable without leaving Slack :sparkles:\n\n'
+      }),
+      Blocks.Divider(),
+      Blocks.Actions()
+        .elements(
+          Elements.Button({
             type: 'plain_text',
-            text: ':new: File a new bug',
+            text: ':new: Create a new record',
             emoji: true
-          },
-          action_id: 'create_record',
-          style: 'primary'
-        },
-        {
-          type: 'button',
-          text: {
+          })
+            .actionId('create_record')
+            .primary(),
+          Elements.Button({
             type: 'plain_text',
-            text: ':link: Visit Airtable base',
+            text: ':link: Open Airtable base',
             emoji: true
-          },
-          action_id: 'url_button',
-          url: `https://airtable.com/${airtableBaseId}/${airtableTableId}`
-        }
-      ]
-    },
-    {
-      type: 'context',
-      elements: [
-        {
-          type: 'image',
-          image_url: 'https://api.slack.com/img/blocks/bkb_template_images/placeholder.png',
-          alt_text: 'placeholder'
-        }
-      ]
-    },
-    {
-      type: 'divider'
-    },
-    {
-      type: 'context',
-      elements: [
-        {
-          type: 'mrkdwn',
-          text: 'Learn more about this Airtable integration example at https://github.com/airtable-labs/example-slack-bug-tracker'
-        }
-      ]
-    }
-  ]
+          })
+            .url(`https://airtable.com/${airtableBaseId}/${airtableTableId}`)
+            .actionId('url_button')
+        ),
+      Blocks.Section({
+        text: '\n'
+      }),
+      Blocks.Section({
+        text: '\n \nLearn more about this Airtable integration example at https://github.com/airtable-labs/example-slack-bug-tracker'
+      })
+    )
+    .buildToObject()
 }
 
-module.exports = simpleAppHome
+module.exports = appHome

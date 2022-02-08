@@ -15,7 +15,7 @@ const util = require('util')
 const helpers = require('./helpers')
 const modalBlocks = require('./views/modals')
 const messageBlocks = require('./views/messages')
-const appHomeBlocks = require('./views/app_home')
+const appHome = require('./views/app_home')
 
 // Call some helper functions in preparation for runtime
 const fieldToPrefillForMessageShortcut = helpers.determineFieldNameForMessageShortcutPrefill(Fields)
@@ -126,10 +126,7 @@ app.event('app_home_opened', async ({ event, client }) => {
   // Publish App Home view
   await client.views.publish({
     user_id: event.user,
-    view: {
-      type: 'home',
-      blocks: appHomeBlocks(EnvVars.AIRTABLE_BASE_ID, EnvVars.AIRTABLE_TABLE_ID)
-    }
+    view: appHome(EnvVars.AIRTABLE_BASE_ID, EnvVars.AIRTABLE_TABLE_ID)
   })
 })
 
