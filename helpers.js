@@ -63,8 +63,13 @@ const validateInputs = (fieldsWithValues) => {
   return errors
 }
 
+const objectStringifiedAsMardownCodeBlock = (object, replacer = null, indent = 2) => {
+  return `\`\`\`\n${JSON.stringify(object, replacer, indent)}\`\`\``
+}
+
 module.exports = {
   determineFieldNameForMessageShortcutPrefill,
   extractInputsFromViewSubmissionPayload,
-  validateInputs
+  validateInputs,
+  objectStringifiedAsMardownCodeBlock
 }

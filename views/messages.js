@@ -1,6 +1,6 @@
 const { Message, Blocks, Elements, ConfirmationDialog } = require('slack-block-builder')
 
-const initialMessageToSubmitter = function (fieldsWithValues, slackUserId) {
+const recordCreationRequestReceived = function (fieldsWithValues, slackUserId) {
   return Message()
     .blocks(
       Blocks.Section()
@@ -13,7 +13,7 @@ const initialMessageToSubmitter = function (fieldsWithValues, slackUserId) {
     .buildToObject()
 }
 
-const successfullySavedToAirtable = function (baseId, tableId, recordId, recordPrimaryFieldValue) {
+const recordCreationSuccessful = function (baseId, tableId, recordId, recordPrimaryFieldValue) {
   return Message()
     .blocks(
       Blocks.Section()
@@ -53,7 +53,7 @@ const successfullySavedToAirtable = function (baseId, tableId, recordId, recordP
     .buildToObject()
 }
 
-const recordUpdateConfirmation = function (fieldsWithValues) {
+const recordUpdateRequestReceived = function (fieldsWithValues) {
   return Message()
     .blocks(
       Blocks.Section()
@@ -86,8 +86,8 @@ const slackSectionFieldGenerator = (key, value) => {
 }
 
 module.exports = {
-  initialMessageToSubmitter,
-  successfullySavedToAirtable,
-  recordUpdateConfirmation,
+  recordCreationRequestReceived,
+  recordCreationSuccessful,
+  recordUpdateRequestReceived,
   simpleMessage
 }
