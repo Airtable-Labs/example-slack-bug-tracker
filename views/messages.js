@@ -1,4 +1,4 @@
-const { Message, Blocks, Elements } = require('slack-block-builder')
+const { Message, Blocks, Elements, ConfirmationDialog } = require('slack-block-builder')
 
 const initialMessageToSubmitter = function (fieldsWithValues, slackUserId) {
   return Message()
@@ -40,13 +40,14 @@ const successfullySavedToAirtable = function (baseId, tableId, recordId, recordP
             .actionId('delete_record')
             .value(recordId)
             .danger()
-            // TODO figure out confirm object
-            // .confirm({
-            //   confirm: 'Are you sure?',
-            //   deny: 'Cancel',
-            //   text: 'Are you sure you want to delete this record? This action cannot be undone.',
-            //   title: 'Delete record'
-            // })
+            .confirm(
+              ConfirmationDialog({
+                title: 'Are you sure?',
+                text: ':bangbang: Are you sure you want to delete this record from Airtable?',
+                confirm: 'Yes, delete record',
+                deny: 'Cancel'
+              })
+            )
         )
     )
     .buildToObject()
