@@ -1,141 +1,71 @@
+const { Modal, Blocks, Elements, Bits, setIfTruthy } = require('slack-block-builder')
+
 // Generate array of input blocks based on Fields config
 const recordFormFields = function (fieldConfigsWithValuesMaybe) {
-  const inputBlocks = []
-  fieldConfigsWithValuesMaybe.forEach((fieldConfig, fieldName) => {
-    const inputBlock = {
-      block_id: fieldName,
-      type: 'input',
-      label: {
-        type: 'plain_text',
-        text: fieldConfig.slackInputLabel
-      },
-      element: {
-        action_id: fieldName,
-        type: fieldConfig.slackElementType,
-        // If options are provided, use them
-        ...(fieldConfig.slackElementOptions && {
-          options: fieldConfig.slackElementOptions.map(slackSelectOption)
-        }),
-        // If multiLine is true, use a textarea
-        ...(fieldConfig.slackElementMultiLine && { multiline: true }),
-        // If the element type is plain_text_input and a value is set, use the initial value
-        ...(fieldConfig.slackElementType === 'plain_text_input' && fieldConfig.value && {
-          initial_value: fieldConfig.value
-        }),
-        // If the element type is static_select and a value is set, use the initial value
-        ...(fieldConfig.slackElementType === 'static_select' && fieldConfig.value && {
-          initial_option: slackSelectOption(fieldConfig.value)
-        })
-      }
+  return Array.from(fieldConfigsWithValuesMaybe, ([fieldName, fieldConfig]) => {
+    const formBlocks = Blocks.Input({
+      label: fieldConfig.slackInputLabel
+    })
+      .blockId(fieldName)
+
+    // TODO support additional Slack element types
+    switch (fieldConfig.slackElementType) {
+      case 'static_select':
+        formBlocks.element(
+          Elements.StaticSelect()
+            .actionId(fieldName)
+            .initialOption(setIfTruthy(fieldConfig.value, slackSelectOption(fieldConfig.value)))
+            .options(fieldConfig.slackElementOptions.map(slackSelectOption))
+        )
+        break
+      default: // plain_text_input
+        formBlocks.element(
+          Elements.TextInput()
+            .actionId(fieldName)
+            .initialValue(fieldConfig.value)
+            .multiline(fieldConfig.slackElementMultiLine === true)
+        )
     }
-    inputBlocks.push(inputBlock)
+    return formBlocks
   })
-  return inputBlocks
 }
 
 const slackSelectOption = function (value) {
-  return {
-    text: {
-      type: 'plain_text',
-      text: value,
-      emoji: true
-    },
-    value: value
-  }
+  return Bits.Option({ text: value, value: value })
 }
 
 const createRecordForm = function (fieldConfigsWithValuesMaybe) {
-  return {
-    type: 'modal',
-    callback_id: 'create_record_submission',
-    submit: {
-      type: 'plain_text',
-      text: 'Submit :rocket:',
-      emoji: true
-    },
-    close: {
-      type: 'plain_text',
-      text: 'Cancel'
-    },
-    title: {
-      type: 'plain_text',
-      text: 'File new bug (dev local)'
-    },
-    blocks: [
-      {
-        block_id: 'form_description',
-        type: 'section',
-        text: {
-          type: 'plain_text',
-          text: 'Please fill out the form below to submit a new bug to the product and engineering team. We will triage it ASAP.'
-        }
-      },
-      {
-        type: 'divider'
-      },
+  return Modal({ title: 'Create record' })
+    .callbackId('create_record_submission')
+    .blocks(
+      Blocks.Section({ text: 'Please fill out the form below to submit a new bug to the product and engineering team. We will triage it ASAP.' }),
+      Blocks.Divider(),
       ...recordFormFields(fieldConfigsWithValuesMaybe)
-    ]
-  }
+    )
+    .submit('Create :rocket:')
+    .buildToObject()
 }
 
 const updateRecordForm = function (fieldConfigsWithValuesMaybe, privateMetadata) {
-  return {
-    type: 'modal',
-    callback_id: 'update_record_submission',
-    private_metadata: privateMetadata,
-    submit: {
-      type: 'plain_text',
-      text: 'Update :rocket:',
-      emoji: true
-    },
-    close: {
-      type: 'plain_text',
-      text: 'Cancel'
-    },
-    title: {
-      type: 'plain_text',
-      text: 'Update bug (dev local)'
-    },
-    blocks: [
-      {
-        block_id: 'form_description',
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: 'Use this form to update the bug report.\n\nNote that the values displayed here are the latest values and may differ from when you originally submitted your report.'
-        }
-      },
-      {
-        type: 'divider'
-      },
+  return Modal({ title: 'Update record' })
+    .callbackId('update_record_submission')
+    .privateMetaData(privateMetadata)
+    .blocks(
+      Blocks.Section({ text: 'Use this form to update the bug report.\n\nNote that the values displayed here are the latest values and may differ from when you originally submitted your report.' }),
+      Blocks.Divider(),
       ...recordFormFields(fieldConfigsWithValuesMaybe)
-    ]
-  }
+    )
+    .submit('Update')
+    .buildToObject()
 }
 
 const simpleMessage = function (message) {
-  return {
-    type: 'modal',
-    title: {
-      type: 'plain_text',
-      text: 'Message',
-      emoji: true
-    },
-    close: {
-      type: 'plain_text',
-      text: 'Close',
-      emoji: true
-    },
-    blocks: [
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: message
-        }
-      }
-    ]
-  }
+  return Modal({ title: 'Information' })
+    .blocks(
+      Blocks.Section({ text: message })
+    )
+    .close('Close')
+    .buildToObject()
 }
 
 module.exports = {

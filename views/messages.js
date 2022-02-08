@@ -1,120 +1,76 @@
-const initialMessageToSubmitter = function (fieldsWithValues, slackUserId) {
-  return [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `<@${slackUserId}> Thank you for your report! The team will triage it ASAP.`
-      }
-    },
-    {
-      type: 'section',
-      fields: fieldsWithValuesToSlackSectionFields(fieldsWithValues)
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: '_This message will update once your submission is saved to Airtable._'
-      }
-    }
-  ]
+const { Message, Blocks, Elements, ConfirmationDialog } = require('slack-block-builder')
+
+const recordCreationRequestReceived = function (fieldsWithValues, slackUserId) {
+  return Message()
+    .blocks(
+      Blocks.Section()
+        .text(`<@${slackUserId}> Thank you for your report! The team will triage it ASAP.`),
+      Blocks.Section()
+        .fields(fieldsWithValuesToSlackSectionFields(fieldsWithValues)),
+      Blocks.Section()
+        .text('_This message will update once your submission is saved to Airtable._')
+    )
+    .buildToObject()
 }
 
-const successfullySavedToAirtable = function (baseId, tableId, recordId, recordPrimaryFieldValue) {
-  return [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `:white_check_mark: Your record has been saved to Airtable. The new record's primary field value is *${recordPrimaryFieldValue}* and the record ID is ${recordId}.`
-      }
-    },
-    {
-      type: 'actions',
-      elements: [
-        {
-          type: 'button',
-          action_id: 'url_button',
-          url: `https://airtable.com/${baseId}/${tableId}/${recordId}`,
-          style: 'primary',
-          text: {
-            type: 'plain_text',
-            emoji: true,
-            text: ':link: Open in browser'
-          }
-        },
-        {
-          type: 'button',
-          action_id: 'edit_record',
-          value: recordId,
-          text: {
-            type: 'plain_text',
-            emoji: true,
-            text: ':writing_hand: Edit'
-          }
-        },
-        {
-          type: 'button',
-          action_id: 'delete_record',
-          value: recordId,
-          style: 'danger',
-          text: {
-            type: 'plain_text',
-            emoji: true,
-            text: ':x: Delete'
-          },
-          confirm: {
-            title: {
-              type: 'plain_text',
-              text: 'Are you sure you want to delete this record from Airtable?'
-            },
-            text: {
-              type: 'mrkdwn',
-              text: 'This action can only be undone by manually deleting the record from Airtable.'
-            },
-            confirm: {
-              type: 'plain_text',
-              text: 'Yes, delete it'
-            },
-            deny: {
-              type: 'plain_text',
-              text: "Stop, I've changed my mind!"
-            }
-          }
-        }
-      ]
-    }
-
-  ]
+const recordCreationSuccessful = function (baseId, tableId, recordId, recordPrimaryFieldValue) {
+  return Message()
+    .blocks(
+      Blocks.Section()
+        .text(`:white_check_mark: Your record has been saved to Airtable. The new record's primary field value is *${recordPrimaryFieldValue}* and the record ID is ${recordId}.`),
+      Blocks.Actions()
+        .elements(
+          Elements.Button({
+            text: ':link: Open in browser',
+            emoji: true
+          })
+            .actionId('url_button')
+            .url(`https://airtable.com/${baseId}/${tableId}/${recordId}`)
+            .primary(),
+          Elements.Button({
+            text: ':writing_hand: Edit',
+            emoji: true
+          })
+            .actionId('edit_record')
+            .value(recordId),
+          Elements.Button({
+            text: ':x: Delete',
+            emoji: true
+          })
+            .actionId('delete_record')
+            .value(recordId)
+            .danger()
+            .confirm(
+              ConfirmationDialog({
+                title: 'Are you sure?',
+                text: ':bangbang: Are you sure you want to delete this record from Airtable?',
+                confirm: 'Yes, delete record',
+                deny: 'Cancel'
+              })
+            )
+        )
+    )
+    .buildToObject()
 }
 
-const recordUpdateConfirmation = function (fieldsWithValues) {
-  return [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: 'Your request to update the record has been received.'
-      }
-    },
-    {
-      type: 'section',
-      fields: fieldsWithValuesToSlackSectionFields(fieldsWithValues)
-    }
-  ]
+const recordUpdateRequestReceived = function (fieldsWithValues) {
+  return Message()
+    .blocks(
+      Blocks.Section()
+        .text('Your request to update the record has been received.'),
+      Blocks.Section()
+        .fields(fieldsWithValuesToSlackSectionFields(fieldsWithValues))
+    )
+    .buildToObject()
 }
 
 const simpleMessage = function (message) {
-  return [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: message
-      }
-    }
-  ]
+  return Message()
+    .blocks(
+      Blocks.Section()
+        .text(message)
+    )
+    .buildToObject()
 }
 
 // Helper functions related to block kit generation
@@ -126,15 +82,12 @@ const fieldsWithValuesToSlackSectionFields = function (fieldsWithValues) {
 }
 
 const slackSectionFieldGenerator = (key, value) => {
-  return {
-    type: 'mrkdwn',
-    text: `*${key}:*\n${value}`
-  }
+  return `*${key}:*\n${value}`
 }
 
 module.exports = {
-  initialMessageToSubmitter,
-  successfullySavedToAirtable,
-  recordUpdateConfirmation,
+  recordCreationRequestReceived,
+  recordCreationSuccessful,
+  recordUpdateRequestReceived,
   simpleMessage
 }
