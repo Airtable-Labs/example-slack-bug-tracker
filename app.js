@@ -80,7 +80,7 @@ app.view('create_record_submission', async ({ ack, body, view, client, logger })
     // If there are no errors, close the modal and DM the user a confirmation
     await ack()
 
-    const initialDmToSubmitterBlocks = messageBlocks.initialMessageToSubmitter(fieldsWithValues, body.user.id)
+    const { blocks: initialDmToSubmitterBlocks } = messageBlocks.initialMessageToSubmitter(fieldsWithValues, body.user.id)
     const initialDmToSubmitter = await client.chat.postMessage({
       channel: body.user.id,
       blocks: initialDmToSubmitterBlocks
@@ -100,14 +100,17 @@ app.view('create_record_submission', async ({ ack, body, view, client, logger })
     })
 
     // Depending on success/failure from Airtable API, update DM to submitter
-    let additionalBlocksForDm = []
+    let additionalBlocksForDm
     try {
       const newRecord = await airtableTable.create([{ fields: newRecordFields }])
       const newRecordId = newRecord[0].getId()
       const newRecordPrimaryFieldValue = newRecord[0].get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)
-      additionalBlocksForDm = messageBlocks.successfullySavedToAirtable(EnvVars.AIRTABLE_BASE_ID, EnvVars.AIRTABLE_TABLE_ID, newRecordId, newRecordPrimaryFieldValue)
+      additionalBlocksForDm = messageBlocks.successfullySavedToAirtable(EnvVars.AIRTABLE_BASE_ID, EnvVars.AIRTABLE_TABLE_ID, newRecordId, newRecordPrimaryFieldValue).blocks
+      console.log('additionalBlocksForDm' + JSON.stringify(additionalBlocksForDm))
     } catch (error) {
-      additionalBlocksForDm = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while sending your record details to Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
+      console.log('error!!')
+      console.error(util.inspect(error))
+      additionalBlocksForDm = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while sending your record details to Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``).blocks
     }
 
     // Update initial DM to submitter
@@ -160,7 +163,7 @@ app.action('delete_record', async ({ ack, action, client, body, logger }) => {
 
     // If successful, update the parent message to user by removing action buttons
     const updatedBlocks = body.message.blocks.slice(0, 2)
-    updatedBlocks.push(...messageBlocks.simpleMessage(`:ghost: Record *${recordBeforeDeletion.get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)}* (${recordId}) was successfully deleted. You can recover deleted records from your <https://support.airtable.com/hc/en-us/articles/115014104628-Base-trash|base trash> for a limited amount of time.`))
+    updatedBlocks.push(...messageBlocks.simpleMessage(`:ghost: Record *${recordBeforeDeletion.get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)}* (${recordId}) was successfully deleted. You can recover deleted records from your <https://support.airtable.com/hc/en-us/articles/115014104628-Base-trash|base trash> for a limited amount of time.`).blocks)
     await client.chat.update({
       blocks: updatedBlocks,
       channel: body.channel.id,
@@ -169,7 +172,7 @@ app.action('delete_record', async ({ ack, action, client, body, logger }) => {
   } catch (error) {
     // If not successful, thread a message to the user with the error
     await client.chat.postMessage({
-      blocks: messageBlocks.simpleMessage(`<@${body.user.id}> There was an error deleting this record (it may have been already deleted by someone else): \`\`\`${JSON.stringify(error, null, 2)} \`\`\``),
+      blocks: messageBlocks.simpleMessage(`<@${body.user.id}> There was an error deleting this record (it may have been already deleted by someone else): \`\`\`${JSON.stringify(error, null, 2)} \`\`\``).blocks,
       channel: body.channel.id,
       thread_ts: body.message.ts
     })
@@ -239,7 +242,7 @@ app.view('update_record_submission', async ({ ack, body, view, client, logger })
     await client.chat.postMessage({
       channel: channelId,
       thread_ts: threadTs,
-      blocks: messageBlocks.recordUpdateConfirmation(fieldsWithValues)
+      blocks: messageBlocks.recordUpdateConfirmation(fieldsWithValues).blocks
     })
 
     // Determine payload for Airtable record update
@@ -253,12 +256,12 @@ app.view('update_record_submission', async ({ ack, body, view, client, logger })
     })
 
     // Depending on success/failure from Airtable API, send DM to submitter (to existing thread)
-    let updateToSubmitter = ''
+    let updateToSubmitter
     try {
       const updatedRecord = await airtableTable.update(recordId, fieldsToUpdate)
-      updateToSubmitter = messageBlocks.simpleMessage(`:white_check_mark: Your <https://airtable.com/${EnvVars.AIRTABLE_BASE_ID}/${EnvVars.AIRTABLE_TABLE_ID}/${recordId}|record> has been updated. The primary field value is now *${updatedRecord.get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)}*`)
+      updateToSubmitter = messageBlocks.simpleMessage(`:white_check_mark: Your <https://airtable.com/${EnvVars.AIRTABLE_BASE_ID}/${EnvVars.AIRTABLE_TABLE_ID}/${recordId}|record> has been updated. The primary field value is now *${updatedRecord.get(EnvVars.AIRTABLE_PRIMARY_FIELD_NAME)}*`).blocks
     } catch (error) {
-      updateToSubmitter = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while updating your <https://airtable.com/${EnvVars.AIRTABLE_BASE_ID}/${EnvVars.AIRTABLE_TABLE_ID}/${recordId}|record> details in Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``)
+      updateToSubmitter = messageBlocks.simpleMessage(`:bangbang: Sorry, but an error occured while updating your <https://airtable.com/${EnvVars.AIRTABLE_BASE_ID}/${EnvVars.AIRTABLE_TABLE_ID}/${recordId}|record> details in Airtable. \nError details: \`\`\`${JSON.stringify(error, null, 2)} \`\`\``).blocks
     }
 
     // Thread update to DM thread
