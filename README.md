@@ -108,7 +108,7 @@ Your app should be ready to try from Slack ðŸš€. Check out the Global Shortcut â
 
 ### 6. Iterate and develop
 - You can run `npm run watch` (instead of `npm run start`) to have `nodemon` watch code files for changes and automatically restart the server for a quicker iterating.
-- To change the fields in the form, update `config/fields.js`. To update user-facing messages, check out `app.js` and `views/` too.
+- To change the fields in the form, update `configs/fields.js`. To update user-facing messages, check out `app.js` and `views/` too.
 
 ## Contributing
 
