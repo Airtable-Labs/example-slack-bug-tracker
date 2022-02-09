@@ -1,6 +1,6 @@
 const { Message, Blocks, Elements, ConfirmationDialog } = require('slack-block-builder')
 
-const recordCreationRequestReceived = function (fieldsWithValues, slackUserId) {
+const recordCreationRequestReceived = (fieldsWithValues, slackUserId) => {
   return Message()
     .blocks(
       Blocks.Section()
@@ -13,7 +13,7 @@ const recordCreationRequestReceived = function (fieldsWithValues, slackUserId) {
     .buildToObject()
 }
 
-const recordCreationSuccessful = function (baseId, tableId, recordId, recordPrimaryFieldValue) {
+const recordCreationSuccessful = (baseId, tableId, recordId, recordPrimaryFieldValue) => {
   return Message()
     .blocks(
       Blocks.Section()
@@ -53,7 +53,7 @@ const recordCreationSuccessful = function (baseId, tableId, recordId, recordPrim
     .buildToObject()
 }
 
-const recordUpdateRequestReceived = function (fieldsWithValues) {
+const recordUpdateRequestReceived = (fieldsWithValues) => {
   return Message()
     .blocks(
       Blocks.Section()
@@ -64,7 +64,7 @@ const recordUpdateRequestReceived = function (fieldsWithValues) {
     .buildToObject()
 }
 
-const simpleMessage = function (message) {
+const simpleMessage = (message) => {
   return Message()
     .blocks(
       Blocks.Section()
@@ -74,7 +74,7 @@ const simpleMessage = function (message) {
 }
 
 // Helper functions related to block kit generation
-const fieldsWithValuesToSlackSectionFields = function (fieldsWithValues) {
+const fieldsWithValuesToSlackSectionFields = (fieldsWithValues) => {
   return Object.keys(fieldsWithValues).map(fieldName => {
     const fieldWithValue = fieldsWithValues[fieldName]
     return slackSectionFieldGenerator(fieldWithValue.slackInputLabel, fieldWithValue.value)

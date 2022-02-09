@@ -1,6 +1,6 @@
 const { HomeTab, Blocks, Elements } = require('slack-block-builder')
 
-const appHome = function (airtableBaseId, airtableTableId) {
+const appHome = (airtableBaseId, airtableTableId) => {
   return HomeTab()
     .blocks(
       Blocks.Header({ text: 'Welcome to the Bug Tracker' }),

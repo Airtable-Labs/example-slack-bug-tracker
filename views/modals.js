@@ -1,7 +1,7 @@
 const { Modal, Blocks, Elements, Bits, setIfTruthy } = require('slack-block-builder')
 
 // Generate array of input blocks based on Fields config
-const recordFormFields = function (fieldConfigsWithValuesMaybe) {
+const recordFormFields = (fieldConfigsWithValuesMaybe) => {
   return Array.from(fieldConfigsWithValuesMaybe, ([fieldName, fieldConfig]) => {
     const formBlocks = Blocks.Input({
       label: fieldConfig.slackInputLabel
@@ -30,11 +30,11 @@ const recordFormFields = function (fieldConfigsWithValuesMaybe) {
   })
 }
 
-const slackSelectOption = function (value) {
+const slackSelectOption = (value) => {
   return Bits.Option({ text: value, value: value })
 }
 
-const createRecordForm = function (fieldConfigsWithValuesMaybe) {
+const createRecordForm = (fieldConfigsWithValuesMaybe) => {
   return Modal({ title: 'Create record' })
     .callbackId('create_record_submission')
     .blocks(
@@ -46,7 +46,7 @@ const createRecordForm = function (fieldConfigsWithValuesMaybe) {
     .buildToObject()
 }
 
-const updateRecordForm = function (fieldConfigsWithValuesMaybe, privateMetadata) {
+const updateRecordForm = (fieldConfigsWithValuesMaybe, privateMetadata) => {
   return Modal({ title: 'Update record' })
     .callbackId('update_record_submission')
     .privateMetaData(privateMetadata)
@@ -59,7 +59,7 @@ const updateRecordForm = function (fieldConfigsWithValuesMaybe, privateMetadata)
     .buildToObject()
 }
 
-const simpleMessage = function (message) {
+const simpleMessage = (message) => {
   return Modal({ title: 'Information' })
     .blocks(
       Blocks.Section({ text: message })

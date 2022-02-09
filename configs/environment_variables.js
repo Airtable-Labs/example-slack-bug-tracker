@@ -5,7 +5,7 @@ const envalid = require('envalid')
 require('dotenv').config()
 
 // Define a custom validator that requires the value to begin with the specified prefix
-const nonEmptyStringStartsWith = function (x) {
+const nonEmptyStringStartsWith = (x) => {
   return envalid.makeValidator((v) => {
     if (v === '') {
       throw new Error('Value must not be empty')
