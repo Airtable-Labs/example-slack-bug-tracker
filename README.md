@@ -6,13 +6,17 @@ This is an example [Slack App](https://api.slack.com/) app built with the [Bolt 
 
 The example code makes use of Slack [Socket Mode](https://api.slack.com/apis/connections/socket) which uses WebSockets (instead of HTTP) to receive events from Slack.
 
+## Features & Functionality
+
 This app has a few entry points and features to help you quickly send information to Airtable without leaving Slack:
 
 | Name and Description 	| Visual 	|
 |------------------------	|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
-| **1. Global Shortcut** ⚡️ <br> You can use the global shortcut :zap: to file a bug from almost anywhere in Slack.     <ol type="a"><li>Trigger the modal with a [global shortcut](https://slackhq.com/speed-up-work-with-apps-for-slack) and enter your bug report in the form</li><li>Submitted values will be validated</li><li>The bot will send you a confirmation DM and let you know if any errors occured</li></ol> 	| [![](docs/global_shortcut.gif)](docs/global_shortcut.gif) |
-| **2. Message Shortcut** 💬<br> You can also open the form by acting on a message using the [Message Shortcut](https://slack.com/help/articles/360004063011-Work-with-apps-in-Slack-using-shortcuts#message-shortcuts). The message you selected will be used to populate the details text area. 	| [![](docs/message_shortcut.gif)](docs/message_shortcut.gif) |
-| **3. App Home** 🏡<br> Visit the app's [App Home](https://api.slack.com/surfaces/tabs) for buttons to file a new bug or open the Airtable base in a browser.	| [![](docs/app_home.png)](docs/app_home.png) |
+| **Global Shortcut** ⚡️ <br> You can use the global shortcut :zap: to file a bug from almost anywhere in Slack.     <ol type="a"><li>Trigger the modal with a [global shortcut](https://slackhq.com/speed-up-work-with-apps-for-slack) and enter your bug report in the form</li><li>Submitted values will be validated</li><li>The bot will send you a confirmation DM and let you know if any errors occured</li></ol> 	| [![](docs/global_shortcut.gif)](docs/global_shortcut.gif) |
+| **Message Shortcut** 💬<br> You can also open the form by acting on a message using the [Message Shortcut](https://slack.com/help/articles/360004063011-Work-with-apps-in-Slack-using-shortcuts#message-shortcuts). The message you selected will be used to populate the details text area. 	| [![](docs/message_shortcut.gif)](docs/message_shortcut.gif) |
+| **App Home** 🏡<br> Visit the app's [App Home](https://api.slack.com/surfaces/tabs) for buttons to file a new bug or open the Airtable base in a browser.	| [![](docs/app_home.png)](docs/app_home.png) |
+| **4. Take Action** ✍️<br> After you create a record, you will get a DM from the app's bot user with links to open the record directly in Airtable or edit/delete the record directly from Slack. | [![](docs/confirmation_message_with_actions.png)](docs/confirmation_message_with_actions.png) |
+
 
 ---
 
