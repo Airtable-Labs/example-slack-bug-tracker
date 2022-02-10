@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "watch": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests defined, exiting with status code 0 (success)\" && exit 0"
   },
   "license": "MIT",
   "dependencies": {
