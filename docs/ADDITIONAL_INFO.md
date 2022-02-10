@@ -8,6 +8,16 @@ This file contains additional information about the code base.
 
 ---
 
+## Slack scopes required
+The principal of least privilege has been considered and the following Slack scopes are required:
+- [Bot token](https://api.slack.com/authentication/token-types#bot) scopes
+  - [`commands`](https://api.slack.com/scopes/commands) - for adding the global and message shortcut
+  - [`chat:write`](https://api.slack.com/scopes/chat:write) - for sending DMs to a user
+- [App token](https://api.slack.com/authentication/token-types#app) scopes - both required for connecting using [Slack Socket Mode](https://api.slack.com/apis/connections/socket) 
+  - [`connections:write`](https://api.slack.com/scopes/connections:write)
+  - [`authorizations:read`](https://api.slack.com/scopes/authorizations:read)
+
+
 ## Third-party dependencies
 In addition to relying on Airtable's and Slack's SaaS platforms, the code in this repository require the following third party Node packages (see [`package.json`](../package.json) for minimum versions):
 - [@slack/bolt](https://www.npmjs.com/package/@slack/bolt) - Framework by Slack to build Slack apps. This repo uses this to connect to the Slack platform to both receive events and respond to them through.
