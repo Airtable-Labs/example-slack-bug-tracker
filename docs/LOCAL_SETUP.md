@@ -1,6 +1,6 @@
 This file outlines the steps to take to get the example app up and running in your local development environment.
 
-Screenshots and GIFs of functionality can be found in this repo's [`../README.md file`](../README.md)
+An overview of this app's functionality can be found in [`../README.md file`](../README.md).
 
 ---
 
