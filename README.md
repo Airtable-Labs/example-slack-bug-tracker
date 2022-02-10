@@ -28,6 +28,10 @@ The software made available from this repository is not supported by Formagrid I
 
 Step-by-step instructions for setting up your Airtable base, Slack app, and to get the app up-and-running in your local development environment can be found in [`docs/LOCAL_SETUP.md`](docs/LOCAL_SETUP.md)
 
+## See also
+
+Additional notes and documentation can be found in [`docs/ADDITIONAL_INFO.md`](docs/ADDITIONAL_INFO.md) including a description of each of the Node packages needed to run this code.
+
 ## Contributing
 
 New issues and PRs are encouraged!
