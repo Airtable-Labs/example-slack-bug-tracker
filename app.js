@@ -251,7 +251,7 @@ app.view('update_record_submission', async ({ ack, body, view, client, logger })
     // Determine payload for Airtable record update
     const fieldsToUpdate = {
       [SystemFields.get('updater_slack_uid').airtableFieldName]: body.user.id,
-      [SystemFields.get('updater_slack_uid').airtableFieldName]: body.user.name
+      [SystemFields.get('updater_slack_name').airtableFieldName]: body.user.name
     }
     Object.keys(fieldsWithValues).forEach((fieldName) => {
       const fieldWithValue = fieldsWithValues[fieldName]
